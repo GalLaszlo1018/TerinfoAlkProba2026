@@ -1,26 +1,42 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Google Térkép</title>
+    <meta charset="UTF-8">
+    <title>Google Térkép</title>
 </head>
 <body>
-<h1>Google Térkép</h1>
+
 <gmp-map
+    id="map"
     center="47.4968478,19.0696438"
     zoom="15"
     map-id="DEMO_MAP_ID"
-    style="height: 400px"
-  >
-  </gmp-map>
-  <!--
-    The `defer` attribute causes the script to execute after the full HTML
-    document has been parsed. -->
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAVArAazEVXfc1ihdx-D9mcu_x0GWV_eKg&libraries=maps"
-    defer
-  >
- 
+    style="height:400px;">
+</gmp-map>
+
+<script type="module">
+async function initMap() {
+    const { AdvancedMarkerElement } =
+        await google.maps.importLibrary("marker");
+
+    const mapElement = document.querySelector("gmp-map");
+
+    new AdvancedMarkerElement({
+        map: mapElement.innerMap,
+        position: {
+            lat: 47.4968772,
+            lng: 19.07044
+        }
+    });
+}
+
+window.initMap = initMap;
 </script>
+
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAVArAazEVXfc1ihdx-D9mcu_x0GWV_eKg&callback=initMap&libraries=marker"
+    async defer>
+</script>
+
 </body>
 </html>
