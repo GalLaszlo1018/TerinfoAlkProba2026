@@ -1,26 +1,51 @@
 <!DOCTYPE html>
 <html>
-  <HEAD>
-    <meta charset="UTF-8">
-    <TITLE>Google Térképem</TITLE>
-  <script type="module" src="./index.js"></script>
-  </HEAD>
+<head>
+<meta charset="utf-8">
+<title>Térkép</title>
+
+<style>
+#map{
+  height:400px;
+  width:100%;
+}
+</style>
+</head>
 <body>
 
 <h1>Itt lesz a térképem</h1>
- <gmp-map
-    center="47.4896178,18.6243391"
-    zoom="9"
-    map-id="DEMO_MAP_ID"
-    style="height: 400px"
-  >
-  </gmp-map>
-  <!--
-    The `defer` attribute causes the script to execute after the full HTML
-    document has been parsed. -->
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBsbfYUGfwQl1uLmHiBjHm6wqCtw77O6rg&libraries=maps"
-    defer
-  ></script>
+<div id="map"></div>
+
+<script>
+function initMap() {
+
+  const pozicio = {
+    lat: 47.5371191,
+    lng: 18.5899557
+  };
+
+  const map = new google.maps.Map(
+    document.getElementById("map"),
+    {
+      zoom: 9,
+      center: pozicio
+    }
+  );
+
+  const marker = new google.maps.Marker({
+    position: pozicio,
+    map: map
+  });
+
+  marker.addListener("click", () => {
+    alert("A markerre kattintottál!");
+  });
+}
+</script>
+
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBsbfYUGfwQl1uLmHiBjHm6wqCtw77O6rg&callback=initMap">
+</script>
+
 </body>
 </html>
