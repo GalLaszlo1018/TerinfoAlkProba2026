@@ -5,19 +5,25 @@
     <title>Szentirmai Soma Javascript</title> 
   </head>
 <body>
-<h1>Javascript Függvény</h1>
-<p>Ez a funkció kösszönni fog.</p>
-
+<h1>Számolás</h1>
+<h2>Téglalap területének kiszámítása</h2>
+<p>Add meg a téglalap oldalait:</p>
+<input type="number" id="oldalA" placeholder="Hosszúság"> <span>cm</span>
+<br><br>
+<input type="number" id="oldalB" placeholder="Szélesség"> <span>cm</span>
+<br><br>
+<button onclick="szamol()">Számolás</button>
 <p id="demo"></p>
-
 <script>
-function sayHello() {
-  return "Köszön!";
+function szamol() {
+let a = document.getElementById("oldalA").value;
+let b = document.getElementById("oldalB").value;
+if (a !== "" && b !== "") {
+let terulet = a * b;
+document.getElementById("demo").innerHTML =
+"A téglalap területe: " + terulet + " cm<sup>2</sup>";
 }
-
-let message = sayHello();
-
-document.getElementById("demo").innerHTML = message;
+}
 </script>
 </body>
-</html>
+</html>  
