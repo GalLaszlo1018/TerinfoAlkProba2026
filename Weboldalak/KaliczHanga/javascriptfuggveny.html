@@ -8,5 +8,31 @@
 
 <h1>JavaScript függvény oldalam</h1>
 
+<h2>Téglalap területének kiszámítása</h2>
+<p>Add meg az "a" oldalt:</p>
+<input type="number" id="aoldal" placeholder="pl. 5">
+
+<p>Add meg a "b" oldalt:</p>
+<input type="number" id="boldal" placeholder="pl. 3">
+
+<br><br>
+<button type="button" onclick="szamol()">Számolás</button>
+
+<p id="eredmeny"></p>
+
+<script>
+function szamol() {
+  let a = document.getElementById("aoldal").value;
+  let b = document.getElementById("boldal").value;
+
+  if (a !== "" && b !== "") {
+    let terulet = a * b;
+    document.getElementById("eredmeny").innerHTML = "A téglalap területe: " + terulet + " m<sup>2</sup>";
+  } else {
+    document.getElementById("eredmeny").innerHTML = "Kérlek, adj meg mindkét számot!";
+  }
+}
+</script>
+
 </body>
 </html>

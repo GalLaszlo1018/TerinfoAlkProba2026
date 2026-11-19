@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="hu"><head><script data-bard-client-injected="true">(function(firebaseConfig, initialAuthToken, appId) {
+        window.__firebase_config = firebaseConfig;
+        window.__initial_auth_token = initialAuthToken;
+        window.__app_id = appId;
+            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6IjExNjRiNzdiNDMzZDdhMDAyMWI4NjE4YjhjYTU3ZTMyZGI5MWUxMTMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6Ly9pZGVudGl0eXRvb2xraXQuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIxNTQwNzI3NDE5NzY2OTA1NTcwMiIsImlzcyI6ImZpcmViYXNlLWFkbWluc2RrLWZic3ZjQGJhcmQtZnJvbnRlbmQuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJjbGFpbXMiOnsiYXBwSWQiOiJjXzBhOWZjNjRkMmViMjBmY2NfaW5kZXguaHRtbC01MjIifSwiZXhwIjoxNzk0NDgyODkwLCJpYXQiOjE3OTQ0NzkyOTAsImFsZyI6IlJTMjU2In0.a6r55IJADf5QxXIpkVI-PDiDGu6xsieMoKXbcPEW-TDmF8GskrK609zAf_jPSQgQQ28e8EHk7KB3PK5zueJp7tftggjRUTsZJw-Grn2OphvAvvvbnw-eRyYQYxOchSi_DCRMcucptBw2UR4bqIZov-N-RFzf7adaEswPMLT7qfm4ecqXke_Uy8zBsKEhDELEu_mHXdIsyfqw_0mjg3Pw7LWrddqd54J-U8AzDjU4CLz4h59joZnQK_RnthtooIM4Q5OUtvloYfLeMw0XQ1-m36brJFkXtWy6mX13dVuLzN0dOpYMI0fWjEStLx4yjEaaw3LISUbgsgILkEGpaWAWdg","c_0a9fc64d2eb20fcc_index.html-522")</script><script data-bard-client-injected="true">
+  document.addEventListener('input', (event) => {
+    if (event.target && (event.target.isContentEditable || event.target.hasAttribute('contenteditable'))) {
+      const clonedDoc = document.cloneNode(true);
+      const injectedScripts = clonedDoc.querySelectorAll('[data-bard-client-injected="true"]');
+      injectedScripts.forEach(el => el.remove());
+      window.parent.postMessage({
+        type: 'inlineEdit',
+        html: '<!DOCTYPE html>\n' + clonedDoc.documentElement.outerHTML
+      }, '*');
+    }
+  });
+</script><script data-bard-client-injected="true">(function(){'use strict';window.addEventListener("message",a=>{a.data&&a.data.type==="SUPPLEMENTAL_DATA_UPDATE"&&window.dispatchEvent(new CustomEvent("supplementaldataupdate",{detail:a.data.data}))});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const SCROLL_KEYS = new Set([
+    'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+    ' ', 'Spacebar', 'PageUp', 'PageDown', 'Home', 'End',
+  ]);
+  const HORIZONTAL_KEYS = new Set(['ArrowLeft', 'ArrowRight']);
+
+  function isTextEntryTarget(target) {
+    if (!target) return false;
+    const tagName = target.tagName;
+    return tagName === 'INPUT' || tagName === 'TEXTAREA' ||
+        tagName === 'SELECT' || target.isContentEditable === true;
+  }
+
+  // An element absorbs the key only if it both overflows on the axis being
+  // scrolled and is configured to scroll on that axis. The cheap dimension
+  // test runs first because getComputedStyle forces a style recalc, and this
+  // runs on every keypress. Each axis is read from its own longhand: the
+  // 'overflow' shorthand serializes as two values when the axes differ, which
+  // is the common 'overflow-x: hidden; overflow-y: auto' pane.
+  function canScroll(node, horizontal) {
+    const overflows = horizontal ? node.scrollWidth > node.clientWidth
+                                 : node.scrollHeight > node.clientHeight;
+    if (!overflows) return false;
+    const style = window.getComputedStyle(node);
+    const overflow = horizontal ? style.overflowX : style.overflowY;
+    return overflow === 'auto' || overflow === 'scroll';
+  }
+
+  // Walks up from the event target so nested scrollers keep their behavior.
+  // <body> is included because pages that pin the root height make it the
+  // scroll container.
+  function hasScrollableAncestor(target, horizontal) {
+    let node = target;
+    while (node && node !== document.documentElement) {
+      if (canScroll(node, horizontal)) return true;
+      node = node.parentElement;
+    }
+    return false;
+  }
+
+  function rootCanScroll(horizontal) {
+    const scroller = document.scrollingElement || document.documentElement;
+    if (!scroller) return false;
+    // Tolerate a pixel of rounding so subpixel layouts do not look scrollable.
+    return horizontal ? scroller.scrollWidth > window.innerWidth + 1
+                      : scroller.scrollHeight > window.innerHeight + 1;
+  }
+
+  window.addEventListener('keydown', function(event) {
+    if (!SCROLL_KEYS.has(event.key)) return;
+    if (event.defaultPrevented) return;
+    // Alt and Meta turn arrows into browser history navigation, and Ctrl is
+    // reserved for shortcuts, so none of them are scroll intent.
+    if (event.altKey || event.metaKey || event.ctrlKey) return;
+
+    const target = event.target;
+    if (isTextEntryTarget(target)) return;
+
+    // Anything that can still absorb the scroll gets to keep it.
+    const horizontal = HORIZONTAL_KEYS.has(event.key);
+    if (rootCanScroll(horizontal)) return;
+    if (hasScrollableAncestor(target, horizontal)) return;
+
+    event.preventDefault();
+  }, {capture: true, passive: false});
+})();</script><script data-bard-client-injected="true">(function() {
+  // Ensure this script is executed only once
+  if (window.firebaseAuthBridgeScriptLoaded) {
+    return;
+  }
+  window.firebaseAuthBridgeScriptLoaded = true;
+
+  let nextTokenPromiseId = 0;
+
+  // Stores { resolve, reject } for ongoing token requests
+  const pendingTokenPromises = {};
+
+  // Listen for messages from the Host Application
+  window.addEventListener('message', function(event) {
+
+    const messageData = event.data;
+
+  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
+      const { success, token, error, promiseId } = messageData ?? {};
+      if (pendingTokenPromises[promiseId]) {
+        if (success) {
+          pendingTokenPromises[promiseId].resolve(token);
+        } else {
+          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
+        }
+        delete pendingTokenPromises[promiseId];
+      }
+    }
+  });
+
+  // Expose a function for the Generated App to request a new Firebase token
+  window.requestNewFirebaseToken = function() {
+    const currentPromiseId = nextTokenPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingTokenPromises[currentPromiseId] = { resolve, reject };
+    });
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'REQUEST_NEW_FIREBASE_TOKEN',
+        promiseId: currentPromiseId
+      }, '*');
+    } else {
+      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
+      delete pendingTokenPromises[currentPromiseId];
+    }
+    return promise;
+  };
+})();</script><script data-bard-client-injected="true">
+let realOriginalGetUserMedia = null;
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+}
+
+(function() {
+  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
+    try {
+      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
+        get: function() {
+          return undefined; // Or throw an error
+        },
+        configurable: false
+      });
+    } catch (error) {
+      console.error("Error defining prototype getter:", error);
+    }
+  }
+})();
+
+(function() {
+  const pendingMediaResolvers = {};
+  let nextMediaPromiseId = 0;
+
+  function requestMediaPermissions(constraints) {
+    const mediaPromiseId = nextMediaPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingMediaResolvers[mediaPromiseId] = (granted) => {
+        delete pendingMediaResolvers[mediaPromiseId];
+        resolve(granted);
+      };
+    });
+
+    window.parent.postMessage({
+      type: 'requestMediaPermission',
+      constraints: constraints,
+      promiseId: mediaPromiseId,
+    }, '*');
+
+    return promise;
+  }
+
+  let originalGetUserMedia = realOriginalGetUserMedia;
+
+  function interceptGetUserMedia() {
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        value: function(constraints) {
+          return requestMediaPermissions(constraints).then((granted) => {
+            if (granted) {
+              if (originalGetUserMedia) {
+                return originalGetUserMedia(constraints);
+              } else {
+                throw new Error("Original getUserMedia not available.");
+              }
+            } else {
+              throw new DOMException('Permission denied', 'NotAllowedError');
+            }
+          });
+        },
+        writable: false,
+        configurable: false
+      });
+    }
+  }
+
+  interceptGetUserMedia();
+
+  const observer = new MutationObserver(function(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'childList' && mutation.addedNodes) {
+        mutation.addedNodes.forEach(node => {
+          if (node === navigator.mediaDevices) {
+            interceptGetUserMedia();
+          }
+        });
+      }
+    }
+  });
+
+  function interceptSpeechRecognition() {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      return;
+    }
+
+    const OriginalSpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const SpeechRecognitionWrapper = function(...args) {
+      const recognizer = new OriginalSpeechRecognition(...args);
+      const originalStart = recognizer.start.bind(recognizer);
+
+      recognizer.start = function() {
+        requestMediaPermissions({ audio: true }).then(granted => {
+          if (granted) {
+            originalStart();
+          } else {
+            const errorEvent = new SpeechRecognitionErrorEvent('error');
+            errorEvent.error = 'not-allowed'; // This is the standard error for permission denial.
+            recognizer.dispatchEvent(errorEvent);
+          }
+        });
+      };
+
+      return recognizer;
+    };
+
+    SpeechRecognitionWrapper.prototype = OriginalSpeechRecognition.prototype;
+    SpeechRecognitionWrapper.prototype.constructor = SpeechRecognitionWrapper;
+
+    if (window.SpeechRecognition) {
+      window.SpeechRecognition = SpeechRecognitionWrapper;
+    }
+    if (window.webkitSpeechRecognition) {
+      window.webkitSpeechRecognition = SpeechRecognitionWrapper;
+    }
+  }
+
+  interceptSpeechRecognition();
+
+  window.addEventListener('message', function(event) {
+    if (event.data) {
+      if (event.data.type === 'resolveMediaPermission') {
+        const { promiseId, granted } = event.data;
+        if (pendingMediaResolvers[promiseId]) {
+          pendingMediaResolvers[promiseId](granted);
+        }
+      }
+    }
+  });
+
+})();</script><script ws-interception-config="{&quot;parentOrigin&quot;:&quot;https://gemini.google.com&quot;,&quot;proxiedDomains&quot;:[]}" data-bard-client-injected="true">(function(){'use strict';var u=typeof Object.defineProperties=="function"?Object.defineProperty:function(b,d,e){if(b==Array.prototype||b==Object.prototype)return b;b[d]=e.value;return b};function v(b){b=["object"==typeof globalThis&&globalThis,b,"object"==typeof window&&window,"object"==typeof self&&self,"object"==typeof global&&global];for(var d=0;d<b.length;++d){var e=b[d];if(e&&e.Math==Math)return e}throw Error("Cannot find global object");}var w=v(this);
+function y(b,d){if(d)a:{var e=w;b=b.split(".");for(var h=0;h<b.length-1;h++){var k=b[h];if(!(k in e))break a;e=e[k]}b=b[b.length-1];h=e[b];d=d(h);d!=h&&d!=null&&u(e,b,{configurable:!0,writable:!0,value:d})}}function z(b){function d(h){return b.next(h)}function e(h){return b.throw(h)}return new Promise(function(h,k){function m(n){n.done?h(n.value):Promise.resolve(n.value).then(d,e).then(m,k)}m(b.next())})}y("globalThis",function(b){return b||w});/*
+
+ Copyright The Closure Library Authors.
+ SPDX-License-Identifier: Apache-2.0
+*/
+function A(b,d){function e(){}e.prototype=d.prototype;b.j=d.prototype;b.prototype=new e;b.prototype.constructor=b;b.h=function(h,k,m){for(var n=Array(arguments.length-2),p=2;p<arguments.length;p++)n[p-2]=arguments[p];return d.prototype[k].apply(h,n)}};function B(b,d,e="*"){function h(a){if(typeof a==="string")return F.encode(a).buffer;if(a instanceof ArrayBuffer)return a.slice(0);if(ArrayBuffer.isView(a))return a.buffer.slice(a.byteOffset,a.byteOffset+a.byteLength);throw Error("Invalid data type");}function k(a){a=h(a);var f={type:"send",data:new Uint8Array(a)},g;(g=r)==null||g.postMessage(f,[a])}function m(){if(!r)throw Error("Data port not captured yet.");r.onmessage=a=>{if(a.data.type==="message"){a=new MessageEvent("message",{data:G.decode(a.data.data)});
+let f;(f=c.onmessage)==null||f.call(c,a);c.dispatchEvent(a)}}}function n(){if(!t)throw Error("Control port not captured yet.");t.onmessage=a=>{switch(a.data.type){case "open":l=1;var f=new Event("open"),g;(g=c.onopen)==null||g.call(c,f);c.dispatchEvent(f);q.forEach(H=>{k(H)});q=[];break;case "close":g=a.data;l=3;g=new CloseEvent("close",{code:g.code,reason:g.reason,wasClean:g.wasClean});(f=c.onclose)==null||f.call(c,g);c.dispatchEvent(g);break;case "error":l=3;f=new Event("error");let x;(x=c.onerror)==
+null||x.call(c,f);c.dispatchEvent(f)}}}function p(a){return z(function*(){var f=new MessageChannel;t=f.port1;var g=new MessageChannel;r=g.port1;n();m();window.parent.postMessage({type:"websocket_open",portOrdering:["control","data"],url:b,protocols:a||[],connectionId:I},e,[f.port2,g.port2])}())}var c=Reflect.construct(EventTarget,[],new.target);c.CONNECTING=0;c.OPEN=1;c.CLOSING=2;c.CLOSED=3;c.url=b;c.binaryType="arraybuffer";c.protocol="";c.i="";var l=0,t=null,r=null,q=[],F=new TextEncoder,G=new TextDecoder;
+c.onopen=null;c.onmessage=null;c.onclose=null;c.onerror=null;Object.defineProperty(c,"readyState",{get:()=>l,enumerable:!0,configurable:!0});Object.defineProperty(c,"bufferedAmount",{get:()=>{var a=0;q.forEach(f=>{a+=typeof f==="string"?f.length:f.byteLength});return a},enumerable:!0,configurable:!0});var I=function(){var a;return((a=globalThis.crypto)==null?0:a.randomUUID)?globalThis.crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,f=>{var g=Math.random()*16|0;return(f===
+"x"?g:g&3|8).toString(16)})}();c.send=a=>{if(l===1)a instanceof Blob?a.arrayBuffer().then(f=>{k(f)}):k(a);else if(l===0)if(typeof a==="string")q.push(a);else if(a instanceof ArrayBuffer||ArrayBuffer.isView(a))q.push(h(a));else throw Error("Sending Blob is not supported before the connection is open.");else console.debug("WebSocket send called in CLOSING or CLOSED state; ignored.")};c.close=(a=1E3,f="")=>{if(l!==2&&l!==3){l=2;a={type:"close",code:a,reason:f,wasClean:a===1E3};var g;(g=t)==null||g.postMessage(a)}};
+Promise.resolve().then(()=>p(d));return c}A(B,EventTarget);var C=document.currentScript,D=C==null?void 0:C.getAttribute("ws-interception-config");if(!D)throw Error("WebSocket Interceptor: Missing ws-interception-config attribute in the script tag.");var E=JSON.parse(D);if(!E.parentOrigin||typeof E.parentOrigin!=="string")throw Error("WebSocket Interceptor: Invalid parentOrigin in ws-interception-config");
+(function(b){var d=Object.getOwnPropertyDescriptor(window,"WebSocket");if(!d||d.writable||d.configurable)d=Object.assign(function(e,h){try{let k=(new URL(e)).hostname;if(b.proxiedDomains.some(m=>k===m||k.endsWith(`.${m}`)))return new B(e,h,b.parentOrigin)}catch(k){throw window.parent.postMessage({type:"websocket_blocked",url:e,reason:"blocked_invalid_url"},b.parentOrigin),new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");}window.parent.postMessage({type:"websocket_blocked",
+url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");},{CONNECTING:0,OPEN:1,CLOSING:2,CLOSED:3}),Object.defineProperty(window,"WebSocket",{value:d,writable:!1,configurable:!1})})({proxiedDomains:E.proxiedDomains||[],parentOrigin:E.parentOrigin});}).call(this);
+</script><script data-bard-client-injected="true">((function(modelInformation) {
+  const originalFetch = window.fetch;
+  // TODO: b/421908508 - Move these out of the script and match all generative AI model calls.
+  let googleLlmBaseApiUrls = [
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':streamGenerateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageEditModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageTransformModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.ttsModelName + ':generateContent',
+  ];
+  modelInformation.deprecatedTextModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+    );
+  });
+  modelInformation.deprecatedImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predict',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predictLongRunning',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedGenerateImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedImageTransformModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+
+  const pendingFetchResolvers = {};
+  let nextPromiseId = 0;
+
+  function handleStringInput(input, optionsArgument) {
+    const actualUrl = input;
+    const fetchCallArgs = [actualUrl, optionsArgument];
+    const effectiveOptions = optionsArgument || {};
+    const bodyForApiKeyCheck = effectiveOptions.body;
+    const bodyForPostMessage = effectiveOptions.body;
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  function handleRequestInput(input, optionsArgument) {
+    const actualUrl = input.url;
+    const fetchCallArgs = [input, optionsArgument];
+    const effectiveOptions = { method: input.method, headers: new Headers(input.headers) };
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (optionsArgument) {
+      if (optionsArgument.method) effectiveOptions.method = optionsArgument.method;
+      if (optionsArgument.headers) effectiveOptions.headers = new Headers(optionsArgument.headers);
+      if ('body' in optionsArgument) {
+        bodyForApiKeyCheck = optionsArgument.body;
+        bodyForPostMessage = optionsArgument.body;
+      } else {
+        bodyForApiKeyCheck = undefined;
+        bodyForPostMessage = input.body;
+      }
+    } else {
+      bodyForApiKeyCheck = undefined;
+      bodyForPostMessage = input.body;
+    }
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  window.fetch = function(input, optionsArgument) {
+    let actualUrl;
+    let fetchCallArgs;
+    let effectiveOptions = {};
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (typeof input === 'string') {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleStringInput(input, optionsArgument));
+    } else if (input instanceof Request) {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleRequestInput(input, optionsArgument));
+    } else {
+      return originalFetch.apply(window, [input, optionsArgument]);
+    }
+
+    effectiveOptions.method = effectiveOptions.method || 'GET';
+    if (!effectiveOptions.headers) {
+      effectiveOptions.headers = new Headers();
+    }
+
+
+    if (typeof actualUrl === 'string' && googleLlmBaseApiUrls.some((url) => actualUrl.startsWith(url))) {
+      let apiKeyIsNull = true;
+
+      const regex = new RegExp("models/([^:]+)");
+      const modelNameMatch = actualUrl.match(regex);
+      const modelName = modelNameMatch ? modelNameMatch[1] : 'unspecified';
+
+
+      try {
+        const urlObject = new URL(actualUrl);  // Use URL object for robust parsing
+        const apiKeyParam = urlObject.searchParams.get('key');
+        if (apiKeyParam) {
+          apiKeyIsNull = false;
+        }
+      } catch (e) {
+        // Continue checks even if URL parsing fails
+      }
+
+      if (apiKeyIsNull && effectiveOptions.headers) {
+        const h = new Headers(effectiveOptions.headers);
+        const apiKeyHeaderValue = h.get('X-API-Key') || h.get('x-api-key');
+        if (apiKeyHeaderValue) {
+          apiKeyIsNull = false;
+          return originalFetch.apply(window, fetchCallArgs);
+        }
+      }
+
+      if (apiKeyIsNull && effectiveOptions.method && ['POST', 'PUT', 'PATCH'].includes(effectiveOptions.method.toUpperCase()) && typeof bodyForApiKeyCheck === 'string') {
+        try {
+          const bodyData = JSON.parse(bodyForApiKeyCheck);
+          if (bodyData && bodyData.apiKey) {
+            apiKeyIsNull = false;
+            return originalFetch.apply(window, fetchCallArgs);
+          }
+        } catch (e) {
+          // Ignore JSON parsing errors
+        }
+      }
+
+      if(apiKeyIsNull) {
+        const promiseId = nextPromiseId++;
+        const promise = new Promise((resolve) => {
+          pendingFetchResolvers[promiseId] = (resolvedResponse) => {
+            delete pendingFetchResolvers[promiseId];
+            resolve(resolvedResponse);
+          };
+        });
+
+        let serializedBodyForPostMessage;
+        if (typeof bodyForPostMessage === 'string' || bodyForPostMessage == null) {
+            serializedBodyForPostMessage = bodyForPostMessage;
+        } else if (bodyForPostMessage instanceof ReadableStream) {
+            serializedBodyForPostMessage = null;
+        } else {
+            try {
+                serializedBodyForPostMessage = JSON.stringify(bodyForPostMessage);
+            } catch (e) {
+                serializedBodyForPostMessage = null;
+            }
+        }
+
+        const messageOptions = {
+            method: effectiveOptions.method,
+            headers: Object.fromEntries(new Headers(effectiveOptions.headers).entries()),
+            body: serializedBodyForPostMessage
+        };
+
+        window.parent.postMessage({
+          type: 'requestFetch',
+          url: actualUrl,
+          modelName: modelName,
+          options: messageOptions,
+          promiseId: promiseId,
+        }, '*');
+
+        return promise;
+      }
+      return originalFetch.apply(window, fetchCallArgs);
+    }
+    return originalFetch.apply(window, fetchCallArgs);
+  };
+
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'resolveFetch') {
+      const { promiseId, response } = event.data;
+      if (pendingFetchResolvers[promiseId]) {
+        try {
+          const reconstructedResponse = new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: new Headers(response.headers),
+          });
+          pendingFetchResolvers[promiseId](reconstructedResponse);
+        } catch (error) {
+          pendingFetchResolvers[promiseId](new Response(null, { status: 500, statusText: "Interceptor Response Reconstruction Error" }));
+        }
+      }
+    }
+  });
+
+}))({"textModelName":"gemini-3-flash-preview","imageModelName":"imagen-4.0-generate-001","imageEditModelName":"gemini-3.1-flash-image","imageTransformModelName":"gemini-3-pro-image","videoModelName":"veo-2.0-generate-001","ttsModelName":"gemini-2.5-flash-preview-tts","deprecatedTextModelNames":["gemini-2.0-flash","gemini-2.5-flash","gemini-2.5-flash-preview-04-17","gemini-2.5-flash-preview-05-20","gemini-2.5-flash-preview-09-2025"],"deprecatedImageModelNames":["imagen-3.0-generate-001","imagen-3.0-generate-002"],"deprecatedGenerateImageModelNames":["gemini-2.5-flash-image-preview","gemini-2.5-flash-image","gemini-3.1-flash-image-preview"],"deprecatedImageTransformModelNames":["gemini-3-pro-image-preview-11-2025"]})</script><script data-bard-client-injected="true">(function() {
+  function normalizeSlug(str) {
+    try {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[^p{L}p{N}s_-]/gu, '')
+        .replace(/s+/g, '-');
+    } catch (e) {
+      return str
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9s_-]/g, '')
+        .replace(/s+/g, '-');
+    }
+  }
+
+  function findTargetElement(hash) {
+    if (!hash || hash === '#') {
+      return null;
+    }
+    const rawId = hash.startsWith('#') ? hash.slice(1) : hash;
+    let decodedId = rawId;
+    try {
+      decodedId = decodeURIComponent(rawId);
+    } catch (e) {
+      // Ignore URI malformed errors.
+    }
+
+    // 1. Direct ID match (raw and decoded).
+    let target = document.getElementById(rawId) || document.getElementById(decodedId);
+    if (target) {
+      return target;
+    }
+
+    // 2. Name attribute match (<a name="...">).
+    try {
+      if (typeof CSS !== 'undefined' && CSS.escape) {
+        target =
+          document.querySelector('[name="' + CSS.escape(rawId) + '"]') ||
+          document.querySelector('[name="' + CSS.escape(decodedId) + '"]');
+      } else {
+        const namedElements = document.getElementsByName(rawId);
+        if (namedElements && namedElements.length > 0) {
+          return namedElements[0];
+        }
+      }
+    } catch (e) {
+      // Ignore querySelector syntax errors.
+    }
+    if (target) {
+      return target;
+    }
+
+    // 3. Match heading text by slug (for Markdown TOCs where headings lack explicit IDs).
+    const targetSlug = normalizeSlug(decodedId);
+    if (targetSlug) {
+      for (const heading of document.querySelectorAll('h1, h2, h3, h4, h5, h6')) {
+        if (normalizeSlug(heading.textContent || '') === targetSlug) {
+          return heading;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  document.addEventListener('click', function(event) {
+    const target = event.target;
+    const anchor = target && typeof target.closest === 'function' ? target.closest('a') : null;
+    if (!anchor) {
+      return;
+    }
+
+    const href = anchor.getAttribute('href');
+    if (
+      !href ||
+      href.trim().toLowerCase().startsWith('javascript:') ||
+      anchor.hasAttribute('download')
+    ) {
+      return;
+    }
+
+    // Check if the link is an in-page hash / anchor link.
+    if (href.startsWith('#')) {
+      event.preventDefault();
+      const targetElement = findTargetElement(href);
+      if (targetElement) {
+        targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+      }
+      return;
+    }
+
+    // Check if the URL has the same origin/pathname but with a hash.
+    try {
+      const url = new URL(anchor.href, window.location.href);
+      if (
+        url.hash &&
+        url.origin === window.location.origin &&
+        url.pathname === window.location.pathname
+      ) {
+        event.preventDefault();
+        const targetElement = findTargetElement(url.hash);
+        if (targetElement) {
+          targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }
+        return;
+      }
+    } catch (e) {
+      // Fall through if URL parsing fails.
+    }
+
+    // For all external or full navigation links, prevent iframe-level navigation
+    // (which breaks in AGSA WebView or sandboxed iframes) and ensure they open
+    // safely in a new tab/window.
+    if (anchor.target !== '_blank') {
+      event.preventDefault();
+      window.open(anchor.href, '_blank', 'noopener,noreferrer');
+    }
+  }, {capture: true});
+})();</script><script data-bard-client-injected="true">(function(){'use strict';function a(){window.parent.postMessage({type:"interaction"},"*")}window.addEventListener("click",a,{capture:!0,passive:!0});window.addEventListener("touchstart",a,{capture:!0,passive:!0});window.addEventListener("keydown",a,{capture:!0,passive:!0});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+
+    /**
+   * Normalizes an error event or a promise rejection reason into a structured error object.
+   * @param {*} errorEventOrReason The error object or reason.
+   * @return {object} Structured error data { message, name, stack }.
+   */
+  function getErrorObject(errorEventOrReason) {
+    if (errorEventOrReason instanceof Error) {
+      return {
+        message: errorEventOrReason.message,
+        name: errorEventOrReason.name,
+        stack: errorEventOrReason.stack,
+      };
+    }
+    // Fallback for non-Error objects.
+    try {
+      return {
+        message: JSON.stringify(errorEventOrReason),
+        name: 'UnknownErrorType',
+        stack: null,
+      };
+    } catch (e) {
+      return {
+        message: String(errorEventOrReason),
+        name: 'UnknownErrorTypeNonStringifiable',
+        stack: null,
+      };
+    }
+  }
+
+  /**
+   * Converts an array of arguments (from log/error) into a single string.
+   * Handles Error objects specially to include their message and stack.
+   * @param {Array<*>} args - Arguments passed to console methods.
+   * @return {string} A string representation of the arguments.
+   */
+  function stringifyArgs(args) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          const {message, stack} = arg;
+          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
+        }
+        if (typeof arg === 'object' && arg !== null) {
+          try {
+            return JSON.stringify(arg);
+          } catch (error) {
+            return '[Circular Object]';
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(' ');
+  }
+
+  console.log = function(...args) {
+    const logString = stringifyArgs(args);
+    window.parent.postMessage({ type: 'log', message: logString }, '*');
+    originalConsoleLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    let errorData;
+    if (args.length > 0 && args[0] instanceof Error) {
+      const err = args[0];
+      // If the first arg is an Error, capture its details.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        ...getErrorObject(err),
+        rawArgsString: stringifyArgs(args.slice(1)),
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // If not an Error object, treat all args as a general error message.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        message: stringifyArgs(args),
+        name: 'ConsoleLoggedError',
+        stack: null,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    window.parent.postMessage(errorData, '*');
+    originalConsoleError.apply(console, args);
+  };
+
+  // Listen for global unhandled synchronous errors.
+  window.addEventListener('error', function(event) {
+    const errorDetails = event.error ? getErrorObject(event.error) : {
+      message: event.message,
+      name: 'GlobalError',
+      stack: null,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    };
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'global',
+      ...errorDetails,
+      message: errorDetails.message || event.message,
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+  // Listen for unhandled promise rejections (asynchronous errors).
+  window.addEventListener('unhandledrejection', function(event) {
+    const errorDetails = getErrorObject(event.reason);
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'unhandledrejection',
+      ...errorDetails,
+      message: errorDetails.message || 'Unhandled Promise Rejection',
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+})();</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sör Térfogat Számoló &amp; Véletlen Sörfőző</title>
+    <!-- Tailwind CSS betöltése -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono a Git Bash terminálhoz -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brew: {
+                            dark: '#120d0a',
+                            card: '#1e1611',
+                            border: '#38281e',
+                            amber: '#f59e0b',
+                            gold: '#fbbf24',
+                            copper: '#d97706',
+                            foam: '#fefce8'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Egyedi görgetősáv és buborék animációk */
+        body {
+            background-color: #120d0a;
+            background-image: radial-gradient(circle at 50% 0%, #2b1d14 0%, #120d0a 70%);
+            color: #f3f4f6;
+        }
+
+        @keyframes rise {
+            0% {
+                transform: translateY(0) scale(1);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.75;
+            }
+            80% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-220px) scale(1.4);
+                opacity: 0;
+            }
+        }
+
+        .beer-bubble {
+            animation: rise var(--duration, 3s) infinite ease-in;
+            animation-delay: var(--delay, 0s);
+        }
+
+        /* Range slider egyedi stílus */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #f59e0b;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+            border: 2px solid #fef3c7;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #38281e;
+            border-radius: 999px;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Inter, sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:JetBrains Mono, monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.pointer-events-none{pointer-events:none}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.sticky{position:sticky}.-right-24{right:-6rem}.-top-24{top:-6rem}.bottom-5{bottom:1.25rem}.left-4{left:1rem}.right-3{right:0.75rem}.right-5{right:1.25rem}.top-0{top:0px}.top-3{top:0.75rem}.z-10{z-index:10}.z-30{z-index:30}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.mb-2{margin-bottom:0.5rem}.mb-2\.5{margin-bottom:0.625rem}.ml-2{margin-left:0.5rem}.mt-0\.5{margin-top:0.125rem}.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.block{display:block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-11{height:2.75rem}.h-3{height:0.75rem}.h-4{height:1rem}.h-60{height:15rem}.h-64{height:16rem}.min-h-\[290px\]{min-height:290px}.min-h-screen{min-height:100vh}.w-11{width:2.75rem}.w-16{width:4rem}.w-3{width:0.75rem}.w-4{width:1rem}.w-56{width:14rem}.w-64{width:16rem}.w-full{width:100%}.min-w-\[90px\]{min-width:90px}.max-w-2xl{max-width:42rem}.max-w-6xl{max-width:72rem}.flex-1{flex:1 1 0%}.shrink-0{flex-shrink:0}.translate-y-24{--tw-translate-y:6rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.translate-y-0{--tw-translate-y:0px;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.cursor-pointer{cursor:pointer}.select-all{-webkit-user-select:all;user-select:all}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.items-baseline{align-items:baseline}.items-stretch{align-items:stretch}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-1\.5{gap:0.375rem}.gap-2{gap:0.5rem}.gap-2\.5{gap:0.625rem}.gap-3{gap:0.75rem}.gap-4{gap:1rem}.gap-6{gap:1.5rem}.space-y-2\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.625rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.625rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.space-y-8 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(2rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(2rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.overflow-visible{overflow:visible}.overflow-x-auto{overflow-x:auto}.rounded{border-radius:0.25rem}.rounded-2xl{border-radius:1rem}.rounded-3xl{border-radius:1.5rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-2{border-width:2px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-amber-500{--tw-border-opacity:1;border-color:rgb(245 158 11 / var(--tw-border-opacity, 1))}.border-amber-500\/30{border-color:rgb(245 158 11 / 0.3)}.border-amber-500\/40{border-color:rgb(245 158 11 / 0.4)}.border-amber-500\/60{border-color:rgb(245 158 11 / 0.6)}.border-brew-border{--tw-border-opacity:1;border-color:rgb(56 40 30 / var(--tw-border-opacity, 1))}.border-brew-border\/60{border-color:rgb(56 40 30 / 0.6)}.border-brew-border\/70{border-color:rgb(56 40 30 / 0.7)}.border-brew-border\/80{border-color:rgb(56 40 30 / 0.8)}.border-emerald-800\/40{border-color:rgb(6 95 70 / 0.4)}.border-stone-700{--tw-border-opacity:1;border-color:rgb(68 64 60 / var(--tw-border-opacity, 1))}.border-stone-800{--tw-border-opacity:1;border-color:rgb(41 37 36 / var(--tw-border-opacity, 1))}.bg-\[\#0d1117\]{--tw-bg-opacity:1;background-color:rgb(13 17 23 / var(--tw-bg-opacity, 1))}.bg-\[\#161b22\]{--tw-bg-opacity:1;background-color:rgb(22 27 34 / var(--tw-bg-opacity, 1))}.bg-amber-500{--tw-bg-opacity:1;background-color:rgb(245 158 11 / var(--tw-bg-opacity, 1))}.bg-amber-500\/10{background-color:rgb(245 158 11 / 0.1)}.bg-amber-500\/15{background-color:rgb(245 158 11 / 0.15)}.bg-amber-500\/20{background-color:rgb(245 158 11 / 0.2)}.bg-amber-500\/80{background-color:rgb(245 158 11 / 0.8)}.bg-brew-card{--tw-bg-opacity:1;background-color:rgb(30 22 17 / var(--tw-bg-opacity, 1))}.bg-brew-dark\/80{background-color:rgb(18 13 10 / 0.8)}.bg-emerald-500\/80{background-color:rgb(16 185 129 / 0.8)}.bg-emerald-600{--tw-bg-opacity:1;background-color:rgb(5 150 105 / var(--tw-bg-opacity, 1))}.bg-emerald-950\/30{background-color:rgb(2 44 34 / 0.3)}.bg-rose-500\/80{background-color:rgb(244 63 94 / 0.8)}.bg-stone-800{--tw-bg-opacity:1;background-color:rgb(41 37 36 / var(--tw-bg-opacity, 1))}.bg-stone-900{--tw-bg-opacity:1;background-color:rgb(28 25 23 / var(--tw-bg-opacity, 1))}.bg-stone-900\/60{background-color:rgb(28 25 23 / 0.6)}.bg-stone-900\/80{background-color:rgb(28 25 23 / 0.8)}.bg-stone-950\/40{background-color:rgb(12 10 9 / 0.4)}.bg-stone-950\/50{background-color:rgb(12 10 9 / 0.5)}.bg-stone-950\/60{background-color:rgb(12 10 9 / 0.6)}.bg-stone-950\/70{background-color:rgb(12 10 9 / 0.7)}.bg-stone-950\/80{background-color:rgb(12 10 9 / 0.8)}.bg-gradient-to-br{background-image:linear-gradient(to bottom right, var(--tw-gradient-stops))}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-amber-400{--tw-gradient-from:#fbbf24 var(--tw-gradient-from-position);--tw-gradient-to:rgb(251 191 36 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-amber-500{--tw-gradient-from:#f59e0b var(--tw-gradient-from-position);--tw-gradient-to:rgb(245 158 11 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.from-amber-500\/20{--tw-gradient-from:rgb(245 158 11 / 0.2) var(--tw-gradient-from-position);--tw-gradient-to:rgb(245 158 11 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.to-amber-600{--tw-gradient-to:#d97706 var(--tw-gradient-to-position)}.to-amber-700{--tw-gradient-to:#b45309 var(--tw-gradient-to-position)}.to-amber-700\/10{--tw-gradient-to:rgb(180 83 9 / 0.1) var(--tw-gradient-to-position)}.p-1\.5{padding:0.375rem}.p-3{padding:0.75rem}.p-3\.5{padding:0.875rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.px-1\.5{padding-left:0.375rem;padding-right:0.375rem}.px-2{padding-left:0.5rem;padding-right:0.5rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-3\.5{padding-left:0.875rem;padding-right:0.875rem}.px-4{padding-left:1rem;padding-right:1rem}.px-5{padding-left:1.25rem;padding-right:1.25rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-3\.5{padding-top:0.875rem;padding-bottom:0.875rem}.py-4{padding-top:1rem;padding-bottom:1rem}.py-6{padding-top:1.5rem;padding-bottom:1.5rem}.pb-4{padding-bottom:1rem}.text-left{text-align:left}.text-center{text-align:center}.text-right{text-align:right}.font-mono{font-family:JetBrains Mono, monospace}.font-sans{font-family:Inter, sans-serif}.text-2xl{font-size:1.5rem;line-height:2rem}.text-\[11px\]{font-size:11px}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-extrabold{font-weight:800}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.leading-relaxed{line-height:1.625}.tracking-tight{letter-spacing:-0.025em}.tracking-wider{letter-spacing:0.05em}.text-amber-100{--tw-text-opacity:1;color:rgb(254 243 199 / var(--tw-text-opacity, 1))}.text-amber-200{--tw-text-opacity:1;color:rgb(253 230 138 / var(--tw-text-opacity, 1))}.text-amber-300{--tw-text-opacity:1;color:rgb(252 211 77 / var(--tw-text-opacity, 1))}.text-amber-400{--tw-text-opacity:1;color:rgb(251 191 36 / var(--tw-text-opacity, 1))}.text-amber-50{--tw-text-opacity:1;color:rgb(255 251 235 / var(--tw-text-opacity, 1))}.text-emerald-300{--tw-text-opacity:1;color:rgb(110 231 183 / var(--tw-text-opacity, 1))}.text-emerald-400{--tw-text-opacity:1;color:rgb(52 211 153 / var(--tw-text-opacity, 1))}.text-stone-200{--tw-text-opacity:1;color:rgb(231 229 228 / var(--tw-text-opacity, 1))}.text-stone-300{--tw-text-opacity:1;color:rgb(214 211 209 / var(--tw-text-opacity, 1))}.text-stone-400{--tw-text-opacity:1;color:rgb(168 162 158 / var(--tw-text-opacity, 1))}.text-stone-500{--tw-text-opacity:1;color:rgb(120 113 108 / var(--tw-text-opacity, 1))}.text-stone-950{--tw-text-opacity:1;color:rgb(12 10 9 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.opacity-0{opacity:0}.opacity-20{opacity:0.2}.opacity-100{opacity:1}.shadow{--tw-shadow:0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-2xl{--tw-shadow:0 25px 50px -12px rgb(0 0 0 / 0.25);--tw-shadow-colored:0 25px 50px -12px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-xl{--tw-shadow:0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-amber-600\/20{--tw-shadow-color:rgb(217 119 6 / 0.2);--tw-shadow:var(--tw-shadow-colored)}.shadow-amber-900\/40{--tw-shadow-color:rgb(120 53 15 / 0.4);--tw-shadow:var(--tw-shadow-colored)}.shadow-emerald-900\/30{--tw-shadow-color:rgb(6 78 59 / 0.3);--tw-shadow:var(--tw-shadow-colored)}.blur-3xl{--tw-blur:blur(64px);filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.drop-shadow-2xl{--tw-drop-shadow:drop-shadow(0 25px 25px rgb(0 0 0 / 0.15));filter:var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)}.backdrop-blur-md{--tw-backdrop-blur:blur(12px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-all{transition-property:all;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.transition-colors{transition-property:color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.duration-300{transition-duration:300ms}.duration-700{transition-duration:700ms}.selection\:bg-amber-500 *::selection{--tw-bg-opacity:1;background-color:rgb(245 158 11 / var(--tw-bg-opacity, 1))}.selection\:text-stone-950 *::selection{--tw-text-opacity:1;color:rgb(12 10 9 / var(--tw-text-opacity, 1))}.selection\:bg-amber-500::selection{--tw-bg-opacity:1;background-color:rgb(245 158 11 / var(--tw-bg-opacity, 1))}.selection\:text-stone-950::selection{--tw-text-opacity:1;color:rgb(12 10 9 / var(--tw-text-opacity, 1))}.hover\:border-amber-500\/60:hover{border-color:rgb(245 158 11 / 0.6)}.hover\:bg-emerald-500:hover{--tw-bg-opacity:1;background-color:rgb(16 185 129 / var(--tw-bg-opacity, 1))}.hover\:bg-stone-700:hover{--tw-bg-opacity:1;background-color:rgb(68 64 60 / var(--tw-bg-opacity, 1))}.hover\:bg-stone-800:hover{--tw-bg-opacity:1;background-color:rgb(41 37 36 / var(--tw-bg-opacity, 1))}.hover\:from-amber-400:hover{--tw-gradient-from:#fbbf24 var(--tw-gradient-from-position);--tw-gradient-to:rgb(251 191 36 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.hover\:to-amber-500:hover{--tw-gradient-to:#f59e0b var(--tw-gradient-to-position)}.hover\:text-white:hover{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.active\:scale-95:active{--tw-scale-x:.95;--tw-scale-y:.95;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}@media (min-width: 640px){.sm\:inline{display:inline}.sm\:grid-cols-3{grid-template-columns:repeat(3, minmax(0, 1fr))}.sm\:grid-cols-4{grid-template-columns:repeat(4, minmax(0, 1fr))}.sm\:flex-row{flex-direction:row}.sm\:items-center{align-items:center}.sm\:gap-3{gap:0.75rem}.sm\:p-7{padding:1.75rem}.sm\:px-6{padding-left:1.5rem;padding-right:1.5rem}.sm\:py-8{padding-top:2rem;padding-bottom:2rem}.sm\:text-2xl{font-size:1.5rem;line-height:2rem}.sm\:text-3xl{font-size:1.875rem;line-height:2.25rem}.sm\:text-base{font-size:1rem;line-height:1.5rem}.sm\:text-sm{font-size:0.875rem;line-height:1.25rem}.sm\:text-xl{font-size:1.25rem;line-height:1.75rem}}@media (min-width: 768px){.md\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.md\:flex-row{flex-direction:row}.md\:items-center{align-items:center}}@media (min-width: 1024px){.lg\:col-span-5{grid-column:span 5 / span 5}.lg\:col-span-7{grid-column:span 7 / span 7}.lg\:grid-cols-12{grid-template-columns:repeat(12, minmax(0, 1fr))}}</style></head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-amber-500 selection:text-stone-950">
+
+    <!-- Értesítő sáv (Toast üzenetekhez, alert() helyett) -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform transition-all duration-300 pointer-events-none translate-y-24 opacity-0">
+        <div class="bg-stone-900 border border-amber-500/60 text-amber-100 px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3">
+            <span id="toast-icon" class="text-xl">🍻</span>
+            <span id="toast-msg" class="text-sm font-medium">Új sör csapolva: Kézműves Komlórobbanás IPA!</span>
+        </div>
+    </div>
+
+    <!-- Fejléc -->
+    <header class="border-b border-brew-border/80 bg-brew-dark/80 backdrop-blur-md sticky top-0 z-30">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-700 flex items-center justify-center text-2xl shadow-lg shadow-amber-900/40">
+                    🍺
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-amber-50">
+                        Sör Térfogat <span class="text-amber-400">Számoló</span>
+                    </h1>
+                    <p class="text-xs text-stone-400">Precíz csapolás &amp; véletlen sörgenerátor</p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button onclick="rollNewBeer()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-stone-950 font-bold text-sm shadow-lg shadow-amber-600/20 active:scale-95 transition flex items-center gap-2 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path><path d="M16 16h5v5"></path></svg>
+                    <span>Másik sört kérek!</span>
+                </button>
+                <button onclick="scrollToGitBash()" class="px-3.5 py-2.5 rounded-xl bg-stone-900 hover:bg-stone-800 border border-stone-700 text-emerald-400 font-mono text-xs sm:text-sm font-semibold active:scale-95 transition flex items-center gap-2 cursor-pointer" title="Git Bash parancsok és kód letöltése">
+                    <span>$_</span>
+                    <span class="hidden sm:inline">Git Bash</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Fő tartalom -->
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-8">
+
+        <!-- 1. SZEKCIÓ: Aktuálisan csapolt (véletlenszerű) sör kártya -->
+        <section class="bg-brew-card border border-brew-border rounded-3xl p-5 sm:p-7 shadow-xl relative overflow-hidden">
+            <!-- Dekoratív háttérfény -->
+            <div id="beer-glow" class="absolute -top-24 -right-24 w-64 h-64 rounded-full blur-3xl opacity-20 pointer-events-none transition-colors duration-700" style="background-color: rgb(234, 88, 12);"></div>
+
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                <div class="space-y-2.5 max-w-2xl">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                            🍻 Aktuális csapolás
+                        </span>
+                        <span id="beer-style-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-stone-800 text-stone-300 border border-stone-700">American IPA</span>
+                        <span id="beer-origin-badge" class="px-3 py-1 rounded-full text-xs text-stone-400 bg-stone-900/80">📍 Budapesti Kisüzem</span>
+                    </div>
+
+                    <h2 id="beer-name" class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Kézműves Komlórobbanás IPA</h2>
+
+                    <p id="beer-desc" class="text-stone-300 text-sm sm:text-base leading-relaxed">Citrusos, mangós és fenyőgyantás komlóillatú karakteres IPA. Garantáltan felébreszti az ízlelőbimbóidat két merge conflict feloldása között.</p>
+                </div>
+
+                <!-- Sör paraméterek (ABV, IBU, Szín, Habzás) -->
+                <div class="grid grid-cols-3 sm:grid-cols-3 gap-3 shrink-0">
+                    <div class="bg-stone-950/70 border border-brew-border rounded-2xl p-3.5 text-center min-w-[90px]">
+                        <div class="text-xs text-stone-400 font-medium">Alkohol</div>
+                        <div id="beer-abv" class="text-lg sm:text-xl font-extrabold text-amber-400 mt-0.5">6.2%</div>
+                        <div class="text-[11px] text-stone-500">ABV</div>
+                    </div>
+                    <div class="bg-stone-950/70 border border-brew-border rounded-2xl p-3.5 text-center min-w-[90px]">
+                        <div class="text-xs text-stone-400 font-medium">Keserűség</div>
+                        <div id="beer-ibu" class="text-lg sm:text-xl font-extrabold text-amber-300 mt-0.5">58</div>
+                        <div class="text-[11px] text-stone-500">IBU</div>
+                    </div>
+                    <div class="bg-stone-950/70 border border-brew-border rounded-2xl p-3.5 text-center min-w-[90px]">
+                        <div class="text-xs text-stone-400 font-medium">Habtartás</div>
+                        <div id="beer-foam-rating" class="text-lg sm:text-xl font-extrabold text-amber-100 mt-0.5">Krémes</div>
+                        <div class="text-[11px] text-stone-500">korona</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. SZEKCIÓ: Térfogat Számoló + Interaktív Korsó Vizualizáció -->
+        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+            
+            <!-- Bal oldal: Méretek és beállítások (7 oszlop) -->
+            <div class="lg:col-span-7 bg-brew-card border border-brew-border rounded-3xl p-5 sm:p-7 shadow-xl flex flex-col justify-between space-y-6">
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between border-b border-brew-border pb-4">
+                        <div>
+                            <h3 class="text-lg sm:text-xl font-bold text-white">Pohár &amp; Korsó Méretező</h3>
+                            <p class="text-xs sm:text-sm text-stone-400">Válassz előre beállított edényt vagy add meg a pontos centimétereket!</p>
+                        </div>
+                    </div>
+
+                    <!-- Gyors előre beállított poharak -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2.5">
+                            Gyors választás (klasszikus méretek)
+                        </label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                            <button type="button" onclick="applyPreset('pikolo')" id="preset-pikolo" class="preset-btn p-3 rounded-2xl border border-brew-border bg-stone-900/60 hover:border-amber-500/60 text-left transition cursor-pointer">
+                                <div class="text-base font-bold text-amber-300">🥃 Pikoló</div>
+                                <div class="text-xs text-stone-400 mt-0.5">~2 dl pohár</div>
+                            </button>
+                            <button type="button" onclick="applyPreset('pohar')" id="preset-pohar" class="preset-btn p-3 rounded-2xl border border-brew-border bg-stone-900/60 hover:border-amber-500/60 text-left transition cursor-pointer">
+                                <div class="text-base font-bold text-amber-300">🥛 Pohár</div>
+                                <div class="text-xs text-stone-400 mt-0.5">~3 dl pohár</div>
+                            </button>
+                            <button type="button" onclick="applyPreset('korso')" id="preset-korso" class="preset-btn p-3 rounded-2xl border-2 border-amber-500 bg-amber-500/10 text-left transition cursor-pointer">
+                                <div class="text-base font-bold text-amber-300">🍺 Korsó</div>
+                                <div class="text-xs text-stone-400 mt-0.5">~5 dl klasszik</div>
+                            </button>
+                            <button type="button" onclick="applyPreset('csizma')" id="preset-csizma" class="preset-btn p-3 rounded-2xl border border-brew-border bg-stone-900/60 hover:border-amber-500/60 text-left transition cursor-pointer">
+                                <div class="text-base font-bold text-amber-300">👢 Csizma</div>
+                                <div class="text-xs text-stone-400 mt-0.5">~10 dl óriás</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Pohár formája választó -->
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider text-stone-400 mb-2">
+                            Edény geometriai formája
+                        </label>
+                        <div class="grid grid-cols-2 gap-3 bg-stone-950/80 p-1.5 rounded-2xl border border-brew-border">
+                            <button type="button" id="shape-cylinder" onclick="setShape('cylinder')" class="py-2.5 px-4 rounded-xl text-sm font-bold bg-amber-500 text-stone-950 shadow transition cursor-pointer">
+                                Henger alakú korsó
+                            </button>
+                            <button type="button" id="shape-frustum" onclick="setShape('frustum')" class="py-2.5 px-4 rounded-xl text-sm font-semibold text-stone-300 hover:text-white transition cursor-pointer">
+                                Csonkakúp (szélesedő pohár)
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Méret csúszkák és számmezők -->
+                    <div class="space-y-4">
+                        <!-- Alsó átmérő (vagy henger átmérő) -->
+                        <div class="bg-stone-950/50 p-4 rounded-2xl border border-brew-border/70">
+                            <div class="flex justify-between items-center mb-2">
+                                <label id="label-bottom-dia" for="bottom-dia" class="text-sm font-semibold text-stone-200">
+                                    Korsó belső átmérője (cm)
+                                </label>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="number" id="bottom-dia-num" min="3" max="20" step="0.1" value="8.0" class="w-16 bg-stone-900 border border-stone-700 rounded-lg px-2 py-1 text-right text-amber-400 font-mono font-bold text-sm">
+                                    <span class="text-xs text-stone-400">cm</span>
+                                </div>
+                            </div>
+                            <input type="range" id="bottom-dia" min="3" max="20" step="0.1" value="8.0" class="w-full">
+                        </div>
+
+                        <!-- Felső átmérő (csak csonkakúp esetén aktív) -->
+                        <div id="top-dia-container" class="hidden bg-stone-950/50 p-4 rounded-2xl border border-brew-border/70">
+                            <div class="flex justify-between items-center mb-2">
+                                <label for="top-dia" class="text-sm font-semibold text-stone-200">
+                                    Pohár felső perem átmérője (cm)
+                                </label>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="number" id="top-dia-num" min="3" max="24" step="0.1" value="9.2" class="w-16 bg-stone-900 border border-stone-700 rounded-lg px-2 py-1 text-right text-amber-400 font-mono font-bold text-sm">
+                                    <span class="text-xs text-stone-400">cm</span>
+                                </div>
+                            </div>
+                            <input type="range" id="top-dia" min="3" max="24" step="0.1" value="9.2" class="w-full">
+                        </div>
+
+                        <!-- Teljes töltési magasság -->
+                        <div class="bg-stone-950/50 p-4 rounded-2xl border border-brew-border/70">
+                            <div class="flex justify-between items-center mb-2">
+                                <label for="total-height" class="text-sm font-semibold text-stone-200">
+                                    Töltési magasság összesen (sör + hab)
+                                </label>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="number" id="total-height-num" min="4" max="35" step="0.1" value="11.5" class="w-16 bg-stone-900 border border-stone-700 rounded-lg px-2 py-1 text-right text-amber-400 font-mono font-bold text-sm">
+                                    <span class="text-xs text-stone-400">cm</span>
+                                </div>
+                            </div>
+                            <input type="range" id="total-height" min="4" max="35" step="0.1" value="11.5" class="w-full">
+                        </div>
+
+                        <!-- Habmagasság -->
+                        <div class="bg-stone-950/50 p-4 rounded-2xl border border-brew-border/70">
+                            <div class="flex justify-between items-center mb-2">
+                                <label for="foam-height" class="text-sm font-semibold text-amber-100 flex items-center gap-2">
+                                    <span>☁️ Habkorona magassága (cm)</span>
+                                </label>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="number" id="foam-height-num" min="0" max="15" step="0.1" value="1.5" class="w-16 bg-stone-900 border border-stone-700 rounded-lg px-2 py-1 text-right text-amber-100 font-mono font-bold text-sm">
+                                    <span class="text-xs text-stone-400">cm</span>
+                                </div>
+                            </div>
+                            <input type="range" id="foam-height" min="0" max="15" step="0.1" value="1.5" class="w-full">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jobb oldal: Vizualizáció & Számított Eredmények (5 oszlop) -->
+            <div class="lg:col-span-5 bg-brew-card border border-brew-border rounded-3xl p-5 sm:p-7 shadow-xl flex flex-col justify-between space-y-6">
+                
+                <!-- Animált SVG Söröskorsó / Pohár -->
+                <div class="flex flex-col items-center justify-center bg-stone-950/60 border border-brew-border/80 rounded-2xl p-6 relative overflow-hidden min-h-[290px]">
+                    <div class="text-xs font-mono text-stone-500 absolute top-3 left-4">ÉLŐ VIZUALIZÁCIÓ</div>
+                    <div id="foam-warning" class="hidden text-xs font-semibold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-2.5 py-1 rounded-full absolute top-3 right-3">
+                        ⚠️ Tiszta hab!
+                    </div>
+
+                    <!-- Dinamikus SVG Korsó -->
+                    <svg id="beer-svg" viewBox="0 0 260 280" class="w-56 h-60 drop-shadow-2xl overflow-visible">
+                        <defs>
+                            <!-- Korsó belső maszk, hogy a folyadék és hab pontosan kövesse a pohár falát -->
+                            <clipPath id="glass-clip">
+                                <polygon id="clip-polygon" points="74,30 166,30 166,240 74,240"></polygon>
+                            </clipPath>
+
+                            <!-- Sör színátmenet -->
+                            <linearGradient id="beer-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop id="grad-stop-1" offset="0%" stop-color="#9a3412"></stop>
+                                <stop id="grad-stop-2" offset="50%" stop-color="#ea580c"></stop>
+                                <stop id="grad-stop-3" offset="100%" stop-color="#c2410c"></stop>
+                            </linearGradient>
+
+                            <!-- Hab színátmenet -->
+                            <linearGradient id="foam-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#ffffff"></stop>
+                                <stop offset="75%" stop-color="#fef3c7"></stop>
+                                <stop offset="100%" stop-color="#fde68a"></stop>
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Korsó füle (csak henger/korsó módban látszik) -->
+                        <path id="mug-handle" d="M 166 65 H 196 C 210 65 218 75 218 90 V 185 C 218 200 210 210 196 210 H 166" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="16" stroke-linecap="round" style="display: block;"></path>
+                        <path id="mug-handle-inner" d="M 166 65 H 196 C 210 65 218 75 218 90 V 185 C 218 200 210 210 196 210 H 166" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="6" stroke-linecap="round" style="display: block;"></path>
+
+                        <!-- Pohár hátsó üvegfala -->
+                        <polygon id="glass-back" points="74,30 166,30 166,240 74,240" fill="rgba(255,255,255,0.04)"></polygon>
+
+                        <!-- Maszkolt tartalom: Sör + Hab + Buborékok -->
+                        <g clip-path="url(#glass-clip)">
+                            <!-- Tiszta sör téglalap -->
+                            <rect id="svg-beer-rect" x="20" y="140.25" width="200" height="99.74999999999999" fill="url(#beer-gradient)" class="transition-all duration-300"></rect>
+                            
+                            <!-- Felszálló buborékok csoportja -->
+                            <g id="bubbles-group"><circle cx="119.10033659307459" cy="221.34208228330525" r="1.9065780218183224" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 2.3175210949646576s; --delay: 0.9468024656985297s;"></circle><circle cx="123.01829523916109" cy="231.48338489388036" r="2.8645359513172934" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 2.6916382410261717s; --delay: 0.13149433951820588s;"></circle><circle cx="148.09464580696743" cy="228.5595941364011" r="1.4140960127014055" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 3.5794659937605995s; --delay: 1.7388899478686186s;"></circle><circle cx="110.53650904405782" cy="229.0832887649832" r="2.125674812924255" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 3.609515242875969s; --delay: 2.0874558451027228s;"></circle><circle cx="94.34384541696268" cy="232.6056715545574" r="2.951982564480417" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 3.1402440490517156s; --delay: 1.324520928694359s;"></circle><circle cx="126.48005174455878" cy="220.7817360278593" r="1.4042216370315492" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 3.618919964013628s; --delay: 1.5204920497449275s;"></circle><circle cx="128.34741059045075" cy="222.42879146517066" r="2.5632631871628684" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 2.3908341435010723s; --delay: 2.7932398810881223s;"></circle><circle cx="141.00618450234217" cy="227.03333478205377" r="2.1486603416428567" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 2.388647859158116s; --delay: 2.702274123717053s;"></circle><circle cx="121.55299942853918" cy="223.8781151130677" r="2.742724559082455" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 3.521640711094605s; --delay: 1.3882274278361741s;"></circle><circle cx="122.76652016059401" cy="224.04758171840436" r="1.444979039252437" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 3.5686175587253084s; --delay: 1.0276855774634215s;"></circle><circle cx="108.96216875146837" cy="221.85824782123095" r="1.5992964377541037" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 3.606601648376076s; --delay: 0.33628429673558047s;"></circle><circle cx="107.25819487212041" cy="222.5457455476042" r="1.7549905903395777" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 4.642470629575781s; --delay: 1.1969664250132506s;"></circle><circle cx="161.17743286994082" cy="232.75147214491824" r="3.056266344542559" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 2.445091431628828s; --delay: 0.24000218130605s;"></circle><circle cx="151.87610427593467" cy="228.0584552155684" r="2.175186039905219" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 2.464655091646802s; --delay: 1.555010478134352s;"></circle><circle cx="123.97821698109092" cy="226.84364234388627" r="1.4049275433549382" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 3.0280996954297317s; --delay: 2.141798609770673s;"></circle><circle cx="154.3306037136713" cy="222.74025330867056" r="2.2769468139754365" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 3.6790093722901274s; --delay: 2.4015284758185214s;"></circle><circle cx="87.23625006780493" cy="229.95405331612258" r="2.182425802681947" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 4.067224944933416s; --delay: 1.8571757931207213s;"></circle><circle cx="131.145438756827" cy="225.2712301469178" r="3.215747364071369" fill="rgba(255, 255, 255, 0.55)" class="beer-bubble" style="--duration: 2.2117012479319205s; --delay: 0.16557517389811716s;"></circle></g>
+
+                            <!-- Habréteg téglalap -->
+                            <rect id="svg-foam-rect" x="20" y="119.25" width="200" height="20.999999999999996" fill="url(#foam-gradient)" class="transition-all duration-300"></rect>
+                        </g>
+
+                        <!-- Pohár külső üveg kontúrja és csillanásai -->
+                        <polygon id="glass-outline" points="74,30 166,30 166,240 74,240" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="4" stroke-linejoin="round"></polygon>
+                        
+                        <!-- Vastag üveg talp -->
+                        <rect id="glass-base" x="72" y="240" width="96" height="14" rx="4" fill="rgba(255,255,255,0.22)" stroke="rgba(255,255,255,0.35)" stroke-width="2"></rect>
+
+                        <!-- Üveg fénycsík -->
+                        <line id="glass-shine" x1="86" y1="42" x2="86" y2="228" stroke="rgba(255,255,255,0.28)" stroke-width="5" stroke-linecap="round"></line>
+                    </svg>
+
+                    <div class="mt-2 text-center">
+                        <span id="ratio-badge" class="text-xs font-medium text-stone-300 bg-stone-900 px-3 py-1 rounded-full border border-stone-800">Arány: 83% sör / 17% hab</span>
+                    </div>
+                </div>
+
+                <!-- Számított térfogat kártyák -->
+                <div class="space-y-3">
+                    <!-- Fő eredmény: Tiszta sör -->
+                    <div class="bg-gradient-to-br from-amber-500/20 to-amber-700/10 border border-amber-500/40 rounded-2xl p-4">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider text-amber-300">🍺 Tiszta sör térfogata</span>
+                            <span id="pure-beer-dl" class="text-xs font-mono bg-amber-500/20 text-amber-200 px-2 py-0.5 rounded-md">4.78 dl</span>
+                        </div>
+                        <div class="mt-1 flex items-baseline justify-between">
+                            <div id="pure-beer-ml" class="text-2xl sm:text-3xl font-extrabold text-white">478 ml</div>
+                            <div id="pure-beer-l" class="text-sm font-semibold text-amber-300">0.478 liter</div>
+                        </div>
+                    </div>
+
+                    <!-- Hab és Összes térfogat -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-stone-950/70 border border-brew-border rounded-2xl p-3.5">
+                            <div class="text-xs text-stone-400">☁️ Hab térfogata</div>
+                            <div id="foam-vol-ml" class="text-lg font-bold text-amber-100 mt-1">101 ml</div>
+                            <div id="foam-vol-dl" class="text-xs text-stone-500">1.01 dl (0.101 l)</div>
+                        </div>
+                        <div class="bg-stone-950/70 border border-brew-border rounded-2xl p-3.5">
+                            <div class="text-xs text-stone-400">📏 Össztérfogat</div>
+                            <div id="total-vol-ml" class="text-lg font-bold text-stone-200 mt-1">578 ml</div>
+                            <div id="total-vol-dl" class="text-xs text-stone-500">5.78 dl (0.578 l)</div>
+                        </div>
+                    </div>
+
+                    <!-- Tiszta alkohol grammban -->
+                    <div class="bg-stone-950/40 border border-brew-border/60 rounded-xl px-4 py-2.5 flex items-center justify-between text-xs text-stone-400">
+                        <span>Tiszta alkohol tartalom ebben a körben:</span>
+                        <span id="pure-alcohol-g" class="font-mono font-bold text-amber-400">23.4 g</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SZEKCIÓ: Git Bash Gyorstalpaló & Export Terminál -->
+        <section id="git-bash-section" class="bg-[#0d1117] border border-stone-800 rounded-3xl overflow-hidden shadow-2xl">
+            <!-- Terminál fejléc -->
+            <div class="bg-[#161b22] px-4 sm:px-6 py-3.5 border-b border-stone-800 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
+                        <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
+                        <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+                    </div>
+                    <span class="font-mono text-xs sm:text-sm text-stone-300 font-semibold ml-2">
+                        MINGW64:~/sor-kalkulator (main) — Git Bash Segédlet &amp; Export
+                    </span>
+                </div>
+
+                <!-- Fájl letöltése gomb -->
+                <button onclick="downloadSourceCode()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold shadow-lg shadow-emerald-900/30 active:scale-95 transition flex items-center gap-2 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    <span>index.html letöltése</span>
+                </button>
+            </div>
+
+            <!-- Terminál tartalom -->
+            <div class="p-5 sm:p-7 space-y-6 font-mono text-xs sm:text-sm">
+                <p class="text-stone-400 font-sans text-sm leading-relaxed">
+                    Szeretnéd saját mappában, <strong class="text-emerald-400">Git Bash</strong> segítségével kezelni és verziókövetni ezt az oldalt? Töltsd le a fenti gombbal az <code class="text-amber-300 bg-stone-800 px-1.5 py-0.5 rounded">index.html</code> fájlt, majd futtasd az alábbi parancsokat a Git Bash terminálban:
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- 1. lépés: Projekt mappa és Git inicializálás -->
+                    <div class="bg-[#161b22] border border-stone-800 rounded-2xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-emerald-400 font-bold"># 1. Projekt mappa &amp; Git indítása</span>
+                            <button onclick="copyCommand('cmd-init')" class="px-2.5 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs transition cursor-pointer">
+                                Másolás
+                            </button>
+                        </div>
+                        <pre id="cmd-init" class="text-stone-200 overflow-x-auto leading-relaxed select-all">mkdir sor-kalkulator
+cd sor-kalkulator
+touch index.html
+git init</pre>
+                    </div>
+
+                    <!-- 2. lépés: Kód mentése és első commit -->
+                    <div class="bg-[#161b22] border border-stone-800 rounded-2xl p-4 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="text-amber-400 font-bold"># 2. Fájl hozzáadása &amp; Commit</span>
+                            <button onclick="copyCommand('cmd-commit')" class="px-2.5 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs transition cursor-pointer">
+                                Másolás
+                            </button>
+                        </div>
+                        <pre id="cmd-commit" class="text-stone-200 overflow-x-auto leading-relaxed select-all">git status
+git add index.html
+git commit -m " feat: sor terfogat szamolo hozzaadva"
+start index.html</pre>
+                    </div>
+                </div>
+
+                <!-- Extra Git Bash tipp -->
+                <div class="bg-emerald-950/30 border border-emerald-800/40 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="text-stone-300 font-sans text-xs sm:text-sm">
+                        <span class="text-emerald-400 font-bold">💡 Pro Tipp:</span> A <code class="text-amber-300 font-mono">start index.html</code> paranccsal közvetlenül a Git Bash terminálból megnyithatod az oldalt az alapértelmezett böngésződben!
+                    </div>
+                    <button onclick="copyAllCommands()" class="shrink-0 px-3.5 py-2 rounded-xl bg-stone-800 hover:bg-stone-700 text-emerald-300 text-xs font-semibold transition cursor-pointer">
+                        Összes parancs másolása
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Lábléc -->
+    <footer class="border-t border-brew-border/60 py-6 text-center text-xs text-stone-500">
+        <p>Készült sörkedvelőknek és fejlesztőknek • Fogyaszd felelősséggel (és tiszta Git history-val)! 🍻</p>
+    </footer>
+
+    <!-- Alkalmazás logika (JavaScript) -->
+    <script>
+        /**
+         * Egyedi sörök adatbázisa: minden betöltéskor vagy gombnyomáskor
+         * ebből sorsol a rendszer egy teljesen más karakterű sört.
+         */
+        const BEERS = [
+            {
+                name: "Soproni Klasszikus Arany",
+                style: "Világos Lager",
+                origin: "Sopron, Magyarország",
+                abv: 4.5,
+                ibu: 22,
+                foamRating: "Tömör",
+                colors: ["#b45309", "#f59e0b", "#d97706"],
+                glow: "#f59e0b",
+                defaultFoamCm: 1.5,
+                desc: "Frissítő, harmonikus keserűségű világos sör, amely pontosan úgy csúszik le egy sikeres 'git push' után, ahogy a nagykönyvben meg van írva."
+            },
+            {
+                name: "Kézműves Komlórobbanás IPA",
+                style: "American IPA",
+                origin: "Budapesti Kisüzem",
+                abv: 6.2,
+                ibu: 58,
+                foamRating: "Krémes",
+                colors: ["#9a3412", "#ea580c", "#c2410c"],
+                glow: "#ea580c",
+                defaultFoamCm: 2.0,
+                desc: "Citrusos, mangós és fenyőgyantás komlóillatú karakteres IPA. Garantáltan felébreszti az ízlelőbimbóidat két merge conflict feloldása között."
+            },
+            {
+                name: "Bajor Felhő Búzasör",
+                style: "Hefeweizen (Szűretlen)",
+                origin: "München / Pécs",
+                abv: 5.1,
+                ibu: 14,
+                foamRating: "Óriási",
+                colors: ["#ca8a04", "#facc15", "#eab308"],
+                glow: "#facc15",
+                defaultFoamCm: 2.6,
+                desc: "Selymesen opálos, banános és szegfűszeges jegyekkel hódító búzasör. Hatalmas, hófehér habkoronát növeszt, ezért óvatosan csapold!"
+            },
+            {
+                name: "Éjféli Sötét Csokoládé Stout",
+                style: "Oatmeal Stout",
+                origin: "Dublin / Győr",
+                abv: 5.8,
+                ibu: 36,
+                foamRating: " Bársonyos",
+                colors: ["#090504", "#271710", "#140b08"],
+                glow: "#78350f",
+                defaultFoamCm: 1.4,
+                desc: "Mélyfekete, pörkölt malátás és étcsokoládés különlegesség. Olyan sötét, mint a terminálod háttere hajnali kettőkor."
+            },
+            {
+                name: "Rubinvörös Meggyes Kézműves",
+                style: "Gyümölcsös Ale",
+                origin: "Eger környéke",
+                abv: 4.0,
+                ibu: 12,
+                foamRating: "Rózsaszínes",
+                colors: ["#7f1d1d", "#dc2626", "#991b1b"],
+                glow: "#ef4444",
+                defaultFoamCm: 1.2,
+                desc: "Valódi magyar meggyel érlelt, fanyar-édes gyümölcsös sörkülönlegesség. Nyári estéken és baráti sörözéseken verhetetlen."
+            },
+            {
+                name: "Cseh Aranyszarvas Pilsner",
+                style: "Bohemian Pilsner",
+                origin: "Plzeň hagyomány",
+                abv: 4.8,
+                ibu: 34,
+                foamRating: "Sűrű",
+                colors: ["#a16207", "#eab308", "#ca8a04"],
+                glow: "#eab308",
+                defaultFoamCm: 1.8,
+                desc: "Saaz komlóval főzött, tiszta malátaízű és határozottan kesernyés klasszikus pilseni. A habja szinte harapható."
+            },
+            {
+                name: "Borostyán Rézangyal Bock",
+                style: "Märzen / Baksör",
+                origin: "Miskolc",
+                abv: 6.8,
+                ibu: 26,
+                foamRating: "Tartós",
+                colors: ["#7c2d12", "#c2410c", "#9a3412"],
+                glow: "#d97706",
+                defaultFoamCm: 1.6,
+                desc: "Gazdag, karamellás-pirított kenyérhéjas ízvilágú, testes borostyánsör. Lassú kortyolgatáshoz tervezve."
+            },
+            {
+                name: "Hazy NEIPA Trópusi Köd",
+                style: "New England IPA",
+                origin: "Szeged",
+                abv: 6.0,
+                ibu: 32,
+                foamRating: "Puha",
+                colors: ["#d97706", "#fbbf24", "#f59e0b"],
+                glow: "#fbbf24",
+                defaultFoamCm: 1.9,
+                desc: "Lédús ananász, maracuja és őszibarack aroma-bomba, alacsony keserűséggel és selymes, opálos megjelenéssel."
+            }
+        ];
+
+        // Előre beállított edényméretek (cm-ben)
+        const PRESETS = {
+            pikolo: { shape: 'frustum', bottomDia: 5.2, topDia: 6.2, totalHeight: 8.8, foamHeight: 1.1 },
+            pohar:  { shape: 'frustum', bottomDia: 5.8, topDia: 7.0, totalHeight: 10.5, foamHeight: 1.3 },
+            korso:  { shape: 'cylinder', bottomDia: 8.0, topDia: 8.0, totalHeight: 11.5, foamHeight: 1.5 },
+            csizma: { shape: 'cylinder', bottomDia: 9.2, topDia: 9.2, totalHeight: 17.5, foamHeight: 2.2 }
+        };
+
+        // Aktuális állapot
+        let currentBeerIndex = -1;
+        let currentShape = 'cylinder'; // 'cylinder' vagy 'frustum'
+
+        // DOM elemek gyors elérése
+        const els = {
+            bottomDia: document.getElementById('bottom-dia'),
+            bottomDiaNum: document.getElementById('bottom-dia-num'),
+            topDia: document.getElementById('top-dia'),
+            topDiaNum: document.getElementById('top-dia-num'),
+            totalHeight: document.getElementById('total-height'),
+            totalHeightNum: document.getElementById('total-height-num'),
+            foamHeight: document.getElementById('foam-height'),
+            foamHeightNum: document.getElementById('foam-height-num'),
+            topDiaContainer: document.getElementById('top-dia-container'),
+            labelBottomDia: document.getElementById('label-bottom-dia')
+        };
+
+        /**
+         * Új véletlenszerű sör kiválasztása (garantáltan más, mint az előző)
+         */
+        function rollNewBeer(isInitial = false) {
+            let nextIndex;
+            do {
+                nextIndex = Math.floor(Math.random() * BEERS.length);
+            } while (nextIndex === currentBeerIndex && BEERS.length > 1);
+
+            currentBeerIndex = nextIndex;
+            const beer = BEERS[currentBeerIndex];
+
+            // UI szövegek frissítése
+            document.getElementById('beer-name').textContent = beer.name;
+            document.getElementById('beer-style-badge').textContent = beer.style;
+            document.getElementById('beer-origin-badge').textContent = `📍 ${beer.origin}`;
+            document.getElementById('beer-desc').textContent = beer.desc;
+            document.getElementById('beer-abv').textContent = `${beer.abv.toFixed(1)}%`;
+            document.getElementById('beer-ibu').textContent = beer.ibu;
+            document.getElementById('beer-foam-rating').textContent = beer.foamRating;
+
+            // Sör színének és háttérfényének frissítése
+            document.getElementById('grad-stop-1').setAttribute('stop-color', beer.colors[0]);
+            document.getElementById('grad-stop-2').setAttribute('stop-color', beer.colors[1]);
+            document.getElementById('grad-stop-3').setAttribute('stop-color', beer.colors[2]);
+            document.getElementById('beer-glow').style.backgroundColor = beer.glow;
+
+            // A habmagasságot finoman az adott sör habzási karakteréhez igazítjuk, ha nem haladja meg a poharat
+            const maxH = parseFloat(els.totalHeight.value);
+            const suggestedFoam = Math.min(beer.defaultFoamCm, maxH * 0.6);
+            els.foamHeight.value = suggestedFoam.toFixed(1);
+            els.foamHeightNum.value = suggestedFoam.toFixed(1);
+
+            calculateAndRender();
+
+            if (!isInitial) {
+                showToast(`Új sör csapolva: ${beer.name}!`, '🍻');
+            }
+        }
+
+        /**
+         * Előre beállított pohár/korsó méret alkalmazása
+         */
+        function applyPreset(presetKey) {
+            const p = PRESETS[presetKey];
+            if (!p) return;
+
+            // Aktív gomb jelölése
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.remove('border-2', 'border-amber-500', 'bg-amber-500/10');
+                btn.classList.add('border', 'border-brew-border', 'bg-stone-900/60');
+            });
+            const activeBtn = document.getElementById(`preset-${presetKey}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('border', 'border-brew-border', 'bg-stone-900/60');
+                activeBtn.classList.add('border-2', 'border-amber-500', 'bg-amber-500/10');
+            }
+
+            setShape(p.shape, false);
+
+            els.bottomDia.value = p.bottomDia;
+            els.bottomDiaNum.value = p.bottomDia;
+            els.topDia.value = p.topDia;
+            els.topDiaNum.value = p.topDia;
+            els.totalHeight.value = p.totalHeight;
+            els.totalHeightNum.value = p.totalHeight;
+            els.foamHeight.value = p.foamHeight;
+            els.foamHeightNum.value = p.foamHeight;
+
+            calculateAndRender();
+        }
+
+        /**
+         * Forma váltása: 'cylinder' (henger) vagy 'frustum' (csonkakúp)
+         */
+        function setShape(shape, recalculate = true) {
+            currentShape = shape;
+            const cylBtn = document.getElementById('shape-cylinder');
+            const fruBtn = document.getElementById('shape-frustum');
+
+            if (shape === 'cylinder') {
+                cylBtn.className = "py-2.5 px-4 rounded-xl text-sm font-bold bg-amber-500 text-stone-950 shadow transition cursor-pointer";
+                fruBtn.className = "py-2.5 px-4 rounded-xl text-sm font-semibold text-stone-300 hover:text-white transition cursor-pointer";
+                els.topDiaContainer.classList.add('hidden');
+                els.labelBottomDia.textContent = "Korsó belső átmérője (cm)";
+            } else {
+                fruBtn.className = "py-2.5 px-4 rounded-xl text-sm font-bold bg-amber-500 text-stone-950 shadow transition cursor-pointer";
+                cylBtn.className = "py-2.5 px-4 rounded-xl text-sm font-semibold text-stone-300 hover:text-white transition cursor-pointer";
+                els.topDiaContainer.classList.remove('hidden');
+                els.labelBottomDia.textContent = "Pohár alsó talp átmérője (cm)";
+            }
+
+            if (recalculate) calculateAndRender();
+        }
+
+        /**
+         * Csonkakúp (vagy henger, ha r1 == r2) térfogatának kiszámítása cm³-ben (= ml)
+         * Képlet: V = (1/3) * π * h * (r1² + r1*r2 + r2²)
+         */
+        function calcFrustumVolume(rBottom, rTop, height) {
+            if (height <= 0) return 0;
+            return (Math.PI * height / 3) * (rBottom * rBottom + rBottom * rTop + rTop * rTop);
+        }
+
+        /**
+         * Fő számítási és SVG kirajzolási függvény
+         */
+        function calculateAndRender() {
+            const dBottom = Math.max(1, parseFloat(els.bottomDia.value) || 8);
+            const dTop = currentShape === 'cylinder' ? dBottom : Math.max(1, parseFloat(els.topDia.value) || dBottom);
+            const hTotal = Math.max(1, parseFloat(els.totalHeight.value) || 10);
+            let hFoam = Math.max(0, parseFloat(els.foamHeight.value) || 0);
+
+            // A hab nem lehet magasabb a teljes töltési magasságnál
+            if (hFoam > hTotal) {
+                hFoam = hTotal;
+                els.foamHeight.value = hFoam.toFixed(1);
+                els.foamHeightNum.value = hFoam.toFixed(1);
+            }
+
+            const hBeer = Math.max(0, hTotal - hFoam);
+
+            const rBottom = dBottom / 2;
+            const rTop = dTop / 2;
+
+            // A sör és a hab határán lévő sugár lineáris interpolációval
+            const ratioBeer = hTotal > 0 ? (hBeer / hTotal) : 0;
+            const rInterface = rBottom + (rTop - rBottom) * ratioBeer;
+
+            // Térfogatok ml-ben (1 cm³ = 1 ml)
+            const pureBeerMl = calcFrustumVolume(rBottom, rInterface, hBeer);
+            const foamMl = calcFrustumVolume(rInterface, rTop, hFoam);
+            const totalMl = pureBeerMl + foamMl;
+
+            // Eredmények kiírása
+            document.getElementById('pure-beer-ml').textContent = `${Math.round(pureBeerMl)} ml`;
+            document.getElementById('pure-beer-dl').textContent = `${(pureBeerMl / 100).toFixed(2)} dl`;
+            document.getElementById('pure-beer-l').textContent = `${(pureBeerMl / 1000).toFixed(3)} liter`;
+
+            document.getElementById('foam-vol-ml').textContent = `${Math.round(foamMl)} ml`;
+            document.getElementById('foam-vol-dl').textContent = `${(foamMl / 100).toFixed(2)} dl (${(foamMl / 1000).toFixed(3)} l)`;
+
+            document.getElementById('total-vol-ml').textContent = `${Math.round(totalMl)} ml`;
+            document.getElementById('total-vol-dl').textContent = `${(totalMl / 100).toFixed(2)} dl (${(totalMl / 1000).toFixed(3)} l)`;
+
+            // Arány jelvény
+            const beerPct = totalMl > 0 ? Math.round((pureBeerMl / totalMl) * 100) : 0;
+            const foamPct = totalMl > 0 ? 100 - beerPct : 0;
+            document.getElementById('ratio-badge').textContent = `Arány: ${beerPct}% sör / ${foamPct}% hab`;
+
+            // Figyelmeztetés, ha 100% hab
+            const foamWarn = document.getElementById('foam-warning');
+            if (hBeer === 0 && hTotal > 0) {
+                foamWarn.classList.remove('hidden');
+            } else {
+                foamWarn.classList.add('hidden');
+            }
+
+            // Tiszta alkohol grammban (sör térfogat * ABV% * 0.789 g/ml etanol sűrűség)
+            const beer = BEERS[currentBeerIndex] || BEERS[0];
+            const alcoholGrams = pureBeerMl * (beer.abv / 100) * 0.789;
+            document.getElementById('pure-alcohol-g').textContent = `${alcoholGrams.toFixed(1)} g`;
+
+            // SVG Vizualizáció frissítése
+            updateGlassSVG(dBottom, dTop, hTotal, hBeer, hFoam);
+        }
+
+        /**
+         * Dinamikus SVG korsó / pohár geometriájának és folyadékszintjének frissítése
+         */
+        function updateGlassSVG(dBottom, dTop, hTotal, hBeer, hFoam) {
+            const centerX = 120;
+            const bottomY = 240;
+            const maxGlassHeightPx = 210;
+            const topY = bottomY - maxGlassHeightPx; // 30
+
+            // Arányos szélesség számítása az SVG nézőtéren belül
+            const maxDia = Math.max(dBottom, dTop, 10);
+            const scaleX = 115 / maxDia;
+
+            const halfBottomPx = Math.min(72, Math.max(24, (dBottom / 2) * scaleX));
+            const halfTopPx = Math.min(82, Math.max(24, (dTop / 2) * scaleX));
+
+            const x1 = centerX - halfTopPx;
+            const x2 = centerX + halfTopPx;
+            const x3 = centerX + halfBottomPx;
+            const x4 = centerX - halfBottomPx;
+
+            const polyPoints = `${x1},${topY} ${x2},${topY} ${x3},${bottomY} ${x4},${bottomY}`;
+
+            document.getElementById('clip-polygon').setAttribute('points', polyPoints);
+            document.getElementById('glass-back').setAttribute('points', polyPoints);
+            document.getElementById('glass-outline').setAttribute('points', polyPoints);
+
+            // Üveg talp igazítása az alsó szélességhez
+            const glassBase = document.getElementById('glass-base');
+            glassBase.setAttribute('x', x4 - 2);
+            glassBase.setAttribute('width', (halfBottomPx * 2) + 4);
+
+            // Fénycsík igazítása a bal oldalhoz
+            const shine = document.getElementById('glass-shine');
+            shine.setAttribute('x1', x1 + 12);
+            shine.setAttribute('x2', x4 + 12);
+
+            // Korsó fülének megjelenítése vagy elrejtése
+            const handle = document.getElementById('mug-handle');
+            const handleInner = document.getElementById('mug-handle-inner');
+            if (currentShape === 'cylinder') {
+                handle.style.display = 'block';
+                handleInner.style.display = 'block';
+                const hx = x3;
+                const dPath = `M ${hx} 65 H ${hx + 30} C ${hx + 44} 65 ${hx + 52} 75 ${hx + 52} 90 V 185 C ${hx + 52} 200 ${hx + 44} 210 ${hx + 30} 210 H ${hx}`;
+                handle.setAttribute('d', dPath);
+                handleInner.setAttribute('d', dPath);
+            } else {
+                handle.style.display = 'none';
+                handleInner.style.display = 'none';
+            }
+
+            // Folyadék és hab magassága pixelben (a pohár kb. 88%-áig ér maximálisan, hogy esztétikus maradjon)
+            const fillRatio = Math.min(0.92, Math.max(0.25, hTotal / 20));
+            const totalFillPx = maxGlassHeightPx * fillRatio;
+
+            const beerHeightPx = hTotal > 0 ? totalFillPx * (hBeer / hTotal) : 0;
+            const foamHeightPx = hTotal > 0 ? totalFillPx * (hFoam / hTotal) : 0;
+
+            const beerY = bottomY - beerHeightPx;
+            const foamY = beerY - foamHeightPx;
+
+            const beerRect = document.getElementById('svg-beer-rect');
+            beerRect.setAttribute('y', beerY);
+            beerRect.setAttribute('height', beerHeightPx);
+
+            const foamRect = document.getElementById('svg-foam-rect');
+            foamRect.setAttribute('y', foamY);
+            foamRect.setAttribute('height', foamHeightPx);
+        }
+
+        /**
+         * Felszálló buborékok generálása az SVG-be
+         */
+        function createBubbles() {
+            const group = document.getElementById('bubbles-group');
+            group.innerHTML = '';
+            for (let i = 0; i < 18; i++) {
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                const cx = 75 + Math.random() * 90;
+                const cy = 220 + Math.random() * 15;
+                const r = 1.2 + Math.random() * 2.2;
+                circle.setAttribute('cx', cx);
+                circle.setAttribute('cy', cy);
+                circle.setAttribute('r', r);
+                circle.setAttribute('fill', 'rgba(255, 255, 255, 0.55)');
+                circle.classList.add('beer-bubble');
+                circle.style.setProperty('--duration', `${2.2 + Math.random() * 2.5}s`);
+                circle.style.setProperty('--delay', `${Math.random() * 3}s`);
+                group.appendChild(circle);
+            }
+        }
+
+        /**
+         * Csúszkák és számbeviteli mezők kétirányú szinkronizálása
+         */
+        function bindInputs(rangeEl, numEl) {
+            rangeEl.addEventListener('input', () => {
+                numEl.value = rangeEl.value;
+                calculateAndRender();
+            });
+            numEl.addEventListener('input', () => {
+                let val = parseFloat(numEl.value);
+                if (!isNaN(val)) {
+                    rangeEl.value = val;
+                    calculateAndRender();
+                }
+            });
+        }
+
+        /**
+         * Git Bash parancsok másolása vágólapra (iframe-barát execCommand megoldással)
+         */
+        function copyCommand(elementId) {
+            const text = document.getElementById(elementId).innerText;
+            copyTextToClipboard(text, 'Git Bash parancs a vágólapra másolva!');
+        }
+
+        function copyAllCommands() {
+            const cmd1 = document.getElementById('cmd-init').innerText;
+            const cmd2 = document.getElementById('cmd-commit').innerText;
+            copyTextToClipboard(`${cmd1}\n\n${cmd2}`, 'Összes Git Bash parancs kimásolva!');
+        }
+
+        function copyTextToClipboard(text, successMessage) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast(successMessage, '📋');
+            } catch (err) {
+                showToast('Nem sikerült a másolás, jelöld ki kézzel!', '⚠️');
+            }
+            document.body.removeChild(textarea);
+        }
+
+        /**
+         * A teljes weboldal forráskódjának letöltése index.html fájlként
+         */
+        function downloadSourceCode() {
+            const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'index.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('index.html letöltve! Másold a sor-kalkulator mappádba.', '💾');
+        }
+
+        /**
+         * Görgetés a Git Bash szekcióhoz
+         */
+        function scrollToGitBash() {
+            document.getElementById('git-bash-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        /**
+         * Toast értesítés megjelenítése
+         */
+        let toastTimeout;
+        function showToast(message, icon = '🍺') {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = message;
+            document.getElementById('toast-icon').textContent = icon;
+
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3200);
+        }
+
+        // Inicializálás az oldal betöltésekor
+        window.addEventListener('DOMContentLoaded', () => {
+            bindInputs(els.bottomDia, els.bottomDiaNum);
+            bindInputs(els.topDia, els.topDiaNum);
+            bindInputs(els.totalHeight, els.totalHeightNum);
+            bindInputs(els.foamHeight, els.foamHeightNum);
+
+            createBubbles();
+            rollNewBeer(true);
+            calculateAndRender();
+        });
+    </script>
+
+</body></html>
