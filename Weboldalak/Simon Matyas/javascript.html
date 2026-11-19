@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<HEAD>
+	<meta charset="UTF-8">
+</HEAD>
+<body>
+<h1>Számolás</h1>
+<h2>Négyzet területének kiszámítása</h2>
+
+<p>Add meg a négyzet oldalát (a):</p>
+<input type="number" id="oldal" placeholder="Pl. 5"> <span>m</span>
+<button onclick="szamol()">Számolás</button>
+
+<p id="demo"></p>
+<div id="jutalomDoboz"></div>
+
+<script>
+function szamol() {
+  let a = document.getElementById("oldal").value;
+  
+  if (a !== "") {
+    let terulet = a * a;
+    document.getElementById("demo").innerHTML = "A négyzet területe: " + terulet + " cm<sup>2</sup>";
+    
+    // Magát a szöveget és a képet is csak most, kattintáskor írjuk be az oldalra
+    document.getElementById("jutalomDoboz").innerHTML = 
+      "<p><b>Jól dolgoztál!</b></p>" +
+      "<img src='https://64.media.tumblr.com/tumblr_m0sujhZ24z1rrdywqo1_400.gif' style='width: 500px;'>";
+  }
+}
+</script>
+</body>
+</html>
