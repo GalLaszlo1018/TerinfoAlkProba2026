@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Négyzet Kerület Számító</title>
+    <!-- Tailwind CSS betöltése -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter betűtípus -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen flex items-center justify-center p-4 transition-colors duration-200">
+
+    <!-- Fő kártya konténer -->
+    <main class="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden">
+        
+        <!-- Fejléc szekció -->
+        <div class="bg-indigo-600 dark:bg-indigo-700 p-6 text-white text-center relative overflow-hidden">
+            <!-- Dekoratív háttérelem -->
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-white opacity-10 rounded-2xl rotate-12 pointer-events-none"></div>
+            
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm mb-3">
+                <!-- Négyzet SVG ikon -->
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="4" width="16" height="16" rx="2" stroke-width="2.5"></rect>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight">Négyzet Kerület Számító</h1>
+            <p class="text-indigo-100 text-sm mt-1">Add meg az oldal hosszát (a) a kerület (K) kiszámításához</p>
+        </div>
+
+        <!-- Tartalom és űrlap szekció -->
+        <div class="p-6 sm:p-8 space-y-6">
+            
+            <!-- Vizuális segítség (Négyzet ábra) -->
+            <div class="flex justify-center py-2">
+                <div class="relative w-28 h-28 border-2 border-indigo-500 dark:border-indigo-400 bg-indigo-50/50 dark:bg-indigo-900/20 rounded-lg flex items-center justify-center transition-all duration-300" id="square-preview">
+                    <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-300 bg-white dark:bg-slate-800 px-2 py-0.5 rounded-md shadow-sm border border-indigo-100 dark:border-indigo-800" id="preview-label">
+                        K = 4 · a
+                    </span>
+                    <!-- Oldal jelölések -->
+                    <span class="absolute -bottom-6 text-sm font-medium text-slate-600 dark:text-slate-300" id="side-a-label">a</span>
+                    <span class="absolute -left-5 text-sm font-medium text-slate-600 dark:text-slate-300">a</span>
+                </div>
+            </div>
+
+            <!-- Beviteli mező és mértékegység választó -->
+            <div class="pt-4">
+                <label for="side-input" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                    A négyzet oldala (<span class="font-semibold text-indigo-600 dark:text-indigo-400">a</span>):
+                </label>
+                <div class="flex rounded-xl shadow-sm">
+                    <input 
+                        type="number" 
+                        id="side-input" 
+                        step="any" 
+                        min="0"
+                        placeholder="Pl.: 5 vagy 12.5" 
+                        class="flex-1 min-w-0 block w-full px-4 py-3 rounded-l-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base transition-colors"
+                    >
+                    <select 
+                        id="unit-select" 
+                        aria-label="Mértékegység"
+                        class="inline-flex items-center px-3 py-3 rounded-r-xl border border-l-0 border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-600 text-slate-700 dark:text-slate-200 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                    >
+                        <option value="mm">mm</option>
+                        <option value="cm" selected>cm</option>
+                        <option value="dm">dm</option>
+                        <option value="m">m</option>
+                        <option value="km">km</option>
+                    </select>
+                </div>
+                <!-- Hibaüzenet konténer -->
+                <p id="error-message" class="hidden mt-2 text-sm text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
+                    <svg class="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    <span id="error-text">Kérlek, adj meg egy pozitív számot!</span>
+                </p>
+            </div>
+
+            <!-- Akció gombok -->
+            <div class="flex gap-3">
+                <button 
+                    id="calculate-btn" 
+                    type="button"
+                    class="flex-1 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold py-3 px-5 rounded-xl shadow-md hover:shadow-lg transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-slate-800"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    Számítás
+                </button>
+                <button 
+                    id="reset-btn" 
+                    type="button"
+                    title="Mezők törlése"
+                    class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-medium py-3 px-4 rounded-xl transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-400"
+                >
+                    Törlés
+                </button>
+            </div>
+
+            <!-- Eredmény és levezetés szekció (alapértelmezetten rejtett) -->
+            <div id="result-container" class="hidden pt-2 border-t border-slate-100 dark:border-slate-700 space-y-4 animate-fade-in">
+                
+                <!-- Végeredmény doboz -->
+                <div class="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800/60 rounded-xl p-4 text-center">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                        A négyzet kerülete (K)
+                    </span>
+                    <div id="result-value" class="text-3xl font-bold text-emerald-800 dark:text-emerald-300 mt-1 break-all">
+                        0 cm
+                    </div>
+                </div>
+
+                <!-- Számítás menete doboz -->
+                <div class="bg-slate-50 dark:bg-slate-700/50 rounded-xl p-4 border border-slate-200/70 dark:border-slate-600/50">
+                    <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2 flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        A számítás menete
+                    </h2>
+                    <div id="calculation-steps" class="space-y-1.5 text-sm font-mono text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 p-3 rounded-lg border border-slate-100 dark:border-slate-700">
+                        <!-- JavaScript tölti fel -->
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // DOM elemek kiválasztása
+        const sideInput = document.getElementById('side-input');
+        const unitSelect = document.getElementById('unit-select');
+        const calculateBtn = document.getElementById('calculate-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        const resultContainer = document.getElementById('result-container');
+        const resultValue = document.getElementById('result-value');
+        const calculationSteps = document.getElementById('calculation-steps');
+        const sideALabel = document.getElementById('side-a-label');
+
+        /**
+         * Szám formázása magyar helyesírás szerint (tizedesvessző és felesleges nullák elhagyása)
+         * @param {number} num - A formázandó szám
+         * @returns {string} - A formázott szöveg
+         */
+        function formatNumber(num) {
+            // Lebegőpontos pontatlanságok kiküszöbölése (pl. 0.1 + 0.2)
+            const rounded = Math.round(num * 1000000) / 1000000;
+            return rounded.toLocaleString('hu-HU', { maximumFractionDigits: 6 });
+        }
+
+        /**
+         * Hibaüzenet megjelenítése
+         * @param {string} msg - A megjelenítendő hibaüzenet
+         */
+        function showError(msg) {
+            errorText.textContent = msg;
+            errorMessage.classList.remove('hidden');
+            sideInput.classList.add('border-rose-500', 'focus:ring-rose-500', 'focus:border-rose-500');
+            sideInput.classList.remove('border-slate-300', 'focus:ring-indigo-500', 'focus:border-indigo-500');
+            resultContainer.classList.add('hidden');
+        }
+
+        /**
+         * Hibaüzenet elrejtése
+         */
+        function clearError() {
+            errorMessage.classList.add('hidden');
+            sideInput.classList.remove('border-rose-500', 'focus:ring-rose-500', 'focus:border-rose-500');
+            sideInput.classList.add('border-slate-300', 'focus:ring-indigo-500', 'focus:border-indigo-500');
+        }
+
+        /**
+         * A négyzet kerületének kiszámítása és megjelenítése
+         */
+        function calculatePerimeter() {
+            try {
+                // Beviteli érték kiolvasása (vessző cseréje pontra, ha szükséges)
+                const rawValue = sideInput.value.trim().replace(',', '.');
+                const unit = unitSelect.value;
+
+                // Validáció: üres mező ellenőrzése
+                if (rawValue === '') {
+                    showError('Kérlek, add meg a négyzet oldalának hosszát!');
+                    return;
+                }
+
+                const sideLength = parseFloat(rawValue);
+
+                // Validáció: érvényes, pozitív szám ellenőrzése
+                if (isNaN(sideLength) || !isFinite(sideLength)) {
+                    showError('Érvénytelen számformátum! Kérlek, csak számokat adj meg.');
+                    return;
+                }
+
+                if (sideLength <= 0) {
+                    showError('Az oldal hossza csak nullánál nagyobb, pozitív szám lehet!');
+                    return;
+                }
+
+                // Ha minden rendben, hibaüzenet törlése
+                clearError();
+
+                // Kerület kiszámítása: K = 4 * a
+                const perimeter = 4 * sideLength;
+
+                // Formázott értékek előállítása
+                const formattedSide = formatNumber(sideLength);
+                const formattedPerimeter = formatNumber(perimeter);
+
+                // Vizuális ábra címkéjének frissítése
+                sideALabel.textContent = `a = ${formattedSide} ${unit}`;
+
+                // Eredmény megjelenítése
+                resultValue.textContent = `${formattedPerimeter} ${unit}`;
+
+                // Számítás menetének lépésről lépésre történő felépítése
+                calculationSteps.innerHTML = `
+                    <div class="text-slate-500 dark:text-slate-400">1. Képlet: <span class="text-slate-800 dark:text-slate-200 font-semibold">K = 4 · a</span></div>
+                    <div class="text-slate-500 dark:text-slate-400">2. Behelyettesítés: <span class="text-slate-800 dark:text-slate-200">K = 4 · ${formattedSide} ${unit}</span></div>
+                    <div class="text-indigo-600 dark:text-indigo-400 font-semibold pt-1 border-t border-slate-100 dark:border-slate-700">3. Eredmény: K = ${formattedPerimeter} ${unit}</div>
+                `;
+
+                // Eredmény konténer megjelenítése
+                resultContainer.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Hiba történt a számítás során:', error);
+                showError('Váratlan hiba történt a számítás közben.');
+            }
+        }
+
+        /**
+         * Űrlap alaphelyzetbe állítása
+         */
+        function resetForm() {
+            sideInput.value = '';
+            clearError();
+            resultContainer.classList.add('hidden');
+            sideALabel.textContent = 'a';
+            sideInput.focus();
+        }
+
+        // Eseménykezelők regisztrálása
+        calculateBtn.addEventListener('click', calculatePerimeter);
+        resetBtn.addEventListener('click', resetForm);
+
+        // Enter billentyű lenyomásának kezelése a beviteli mezőben
+        sideInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                calculatePerimeter();
+            }
+        });
+
+        // Mértékegység váltásakor automatikus újraszámolás, ha már van eredmény
+        unitSelect.addEventListener('change', () => {
+            if (!resultContainer.classList.contains('hidden')) {
+                calculatePerimeter();
+            }
+        });
+    </script>
+</body>
+</html>
