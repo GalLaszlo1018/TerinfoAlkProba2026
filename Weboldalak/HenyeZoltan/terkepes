@@ -11,6 +11,14 @@
     map-id="AIzaSyATN59BlHCK83QWMvawSGD3TvwwAgJINqM"
     style="height: 400px"
   >
+  <gmp-map
+    center="47.72429373700359, 16.65044370974212"
+    zoom="13"
+    map-id="DEMO_MAP_ID">
+    <gmp-advanced-marker
+        position="47.72429373700359, 16.65044370974212"
+        title="smith tavern"></gmp-advanced-marker>
+</gmp-map>
   </gmp-map>
   <!--
     The `defer` attribute causes the script to execute after the full HTML
