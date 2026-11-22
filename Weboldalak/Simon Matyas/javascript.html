@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<HEAD>
+	<meta charset="UTF-8">
+</HEAD>
+<body>
+<h1>Számolás</h1>
+<h2>Téglalap területének kiszámítása</h2>
+
+<p>Add meg a téglalap első oldalát (a):</p>
+<input type="number" id="oldal" placeholder="Pl. 5"> 
+<span>m</span>
+
+<p>Add meg a téglalap második oldalát (b):</p>
+<input type="number" id="oldal" placeholder="Pl. 5"> 
+<span>m</span>
+
+<button onclick="teglalapSzamol()">Számolás</button>
+
+<p id="teglalapEredmeny"></p>
+
+<script>
+function teglalapSzamol() {
+    let a = document.getElementById("oldalA").value;
+    let b = document.getElementById("oldalB").value;
+
+    if (a !== "" && b !== "" && a > 0 && b > 0) {
+        let terulet = a * b;
+
+        document.getElementById("teglalapEredmeny").innerHTML =
+            "A téglalap területe: " + terulet + " m<sup>2</sup>";
+    } else {
+        document.getElementById("teglalapEredmeny").innerHTML =
+            "Kérlek, add meg mindkét oldalt!";
+    }
+}
+</script>
+</body>
+</html>

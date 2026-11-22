@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="UTF-8">
+<body>
+
+<h2>Téglalap kerülete</h2>
+
+<input type="number" id="a" placeholder="Hosszúság">
+<input type="number" id="b" placeholder="Szélesség">
+
+<button onclick="szamol()">Számolás</button>
+
+<p id="eredmeny"></p>
+
+<script>
+function szamol() {
+    let a = Number(document.getElementById("a").value);
+    let b = Number(document.getElementById("b").value);
+
+    let k = 2 * (a + b);
+
+    document.getElementById("eredmeny").innerHTML = "Kerület: " + k;
+}
+</script>
+
+</body>
+</html>
