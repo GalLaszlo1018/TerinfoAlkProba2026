@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Google térkép JavaScripttel</title>
+  <style>
+    #map { height: 400px; }
+  </style>
+</head>
+<body>
+
+<h1>Google térképem JavaScripttel</h1>
+<p>Ez a budapesti libegő felső állomása.</p>
+
+<div id="map"></div>
+
+<script
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNGtw2yUiyjsHpTu7vL9PXo7tDA9do7mc&callback=initMap&v=weekly&libraries=marker"
+  defer
+></script>
+
+<script>
+  async function initMap() {
+    const { Map } = await google.maps.importLibrary("maps");
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+    const map = new Map(document.getElementById("map"), {
+      center: { lat: 47.51587857646459, lng: 18.960334328856984 },
+      zoom: 17,
+      mapId: "DEMO_MAP_ID",
+    });
+
+    new AdvancedMarkerElement({
+      map: map,
+      position: { lat: 47.51587857646459, lng: 18.960334328856984 },
+      title: "Libegő felső állomása",
+    });
+  }
+</script>
+
+</body>
+</html>
