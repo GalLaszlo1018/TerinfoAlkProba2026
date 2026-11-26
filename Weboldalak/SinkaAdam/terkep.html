@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Térkép</title>
+
+<style>
+#map{
+  height:400px;
+  width:100%;
+}
+</style>
+</head>
+<body>
+
+<h1>Itt lesz a térképem</h1>
+<div id="map"></div>
+
+<script>
+function initMap() {
+
+  const pozicio = {
+    lat: 47.189533, 
+
+
+    lng: 16.944142
+  };
+
+  const map = new google.maps.Map(
+    document.getElementById("map"),
+    {
+      zoom: 9,
+      center: pozicio
+    }
+  );
+
+  const marker = new google.maps.Marker({
+    position: pozicio,
+    map: map
+  });
+
+  marker.addListener("click", () => {
+    alert("A markerre kattintottál!");
+  });
+}
+</script>
+
+<script async defer
+src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBsbfYUGfwQl1uLmHiBjHm6wqCtw77O6rg&callback=initMap">
+</script>
+
+</body>
+</html>

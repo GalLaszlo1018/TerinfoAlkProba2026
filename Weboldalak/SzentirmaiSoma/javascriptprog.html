@@ -3,10 +3,27 @@
 <head>
 	<meta charset="UTF-8">
     <title>Szentirmai Soma Javascript</title> 
-  </head>
+</head>
+  <style>
+        body {
+			background-color: #555;
+			color: white;
+            text-align: center;
+        }
+
+		.box {
+    border: 3px solid black;
+    width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+	background-color: #333;
+}
+    </style>
 <body>
+	<div class="box">
 <h1>Számolás</h1>
 <h2>Téglalap területének kiszámítása</h2>
+
 <p>Add meg a téglalap oldalait:</p>
 <input type="number" id="oldalA" placeholder="Hosszúság"> <span>cm</span>
 <br><br>
@@ -14,6 +31,7 @@
 <br><br>
 <button onclick="szamol()">Számolás</button>
 <p id="demo"></p>
+
 <script>
 function szamol() {
 let a = document.getElementById("oldalA").value;
@@ -25,5 +43,6 @@ document.getElementById("demo").innerHTML =
 }
 }
 </script>
+	</div>
 </body>
 </html>  
