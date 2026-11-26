@@ -3,12 +3,15 @@
 <head>
 <meta charset="utf-8">
 <title>Térkép</title>
-
+ 
 <style>
-#map{
-  height:400px;
-  width:100%;
-}
+	#map {
+    margin: 0 auto;
+    height: 600px;
+    width: 90%;
+    border: 3px solid black;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);}
 </style>
 </head>
 <body>
@@ -32,15 +35,17 @@ function initMap() {
     }
   );
 
-  const marker = new google.maps.Marker({
-    position: pozicio,
-    map: map
-  });
+const marker = new google.maps.Marker({
+  position: pozicio,
+  map: map,
+  icon: "https://maps.google.com/mapfiles/kml/shapes/homegardenbusiness.png"
+});
 
   marker.addListener("click", () => {
     alert("A markerre kattintottál!");
   });
 }
+
 </script>
 
 <script async defer
