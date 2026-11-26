@@ -1,0 +1,19 @@
+<html>
+<body>
+
+    <h2>Összeadás</h2>
+    <input type="number" id="a" placeholder="Első szám"> +
+    <input type="number" id="b" placeholder="Második szám">
+    <button onclick="osszead()">=</button>
+    <span id="eredmeny"></span>
+
+    <script>
+        function osszead() {
+            let szam1 = Number(document.getElementById("a").value);
+            let szam2 = Number(document.getElementById("b").value);
+            document.getElementById("eredmeny").innerText = szam1 + szam2;
+        }
+    </script>
+
+</body>
+</html>
