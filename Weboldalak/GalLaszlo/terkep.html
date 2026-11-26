@@ -1,47 +1,186 @@
-<HTML>
-  <HEAD>
+<html>
+
+<html lang="hu">
+
+<head>
     <meta charset="UTF-8">
-    <TITLE>Gál László google tkp</TITLE>
-  </HEAD>
-  <BODY>
-    <H1>Orosháza</H1>
-  <gmp-map
-    center="46.5684,20.6545"
-    zoom="6"
-    map-id="DEMO_MAP_ID"
-    style="height: 400px"
-  >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Gál László – Orosháza térképe</title>
+
+<style>
+    {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #e8f0f5, #d4e3ed);
+        min-height: 100vh;
+        padding: 40px 20px;
+        color: #263746;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: auto;
+    }
+
+    header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    header h1 {
+        font-size: 38px;
+        color: #174a68;
+        margin-bottom: 10px;
+        letter-spacing: 2px;
+    }
+
+    header p {
+        font-size: 16px;
+        color: #617786;
+    }
+
+    .map-card {
+        background: white;
+        padding: 15px;
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    #map {
+        width: 100%;
+        height: 550px;
+        border-radius: 12px;
+    }
+
+    .info {
+        margin-top: 25px;
+        padding: 25px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.07);
+        text-align: center;
+    }
+
+    .info h2 {
+        color: #174a68;
+        margin-bottom: 12px;
+    }
+
+    .info p {
+        color: #617786;
+        line-height: 1.6;
+    }
+
+    footer {
+        text-align: center;
+        margin-top: 30px;
+        color: #718492;
+        font-size: 13px;
+    }
+
+    @media (max-width: 600px) {
+        header h1 {
+            font-size: 28px;
+        }
+
+        #map {
+            height: 400px;
+        }
+    }
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <h1>OROSHÁZA</h1>
+        <p>Google Térképes helymeghatározás</p>
+    </header>
+
+    <div class="map-card">
+        <div id="map"></div>
+    </div>
+
+    <div class="info">
+        <h2>Orosháza központja</h2>
+
+        <p>
+            Orosháza Magyarország délkeleti részén,
+            Békés vármegyében található település.
+            A térképen a város központi elhelyezkedése látható.
+        </p>
+
+        <p style="margin-top: 10px;">
+            <strong>Koordináták:</strong>
+            46.5684° É, 20.6545° K
+        </p>
+    </div>
+
+    <footer>
+        Készítette: Gál László
+    </footer>
+
+</div>
+
+<script>
+    async function initMap() {
+
+        const { Map } = await google.maps.importLibrary("maps");
+
+        const { AdvancedMarkerElement } =
+            await google.maps.importLibrary("marker");
+
+        const map = new Map(document.getElementById("map"), {
+
+            center: {
+                lat: 46.5684,
+                lng: 20.6545
+            },
+
+            zoom: 13,
+
+            mapId: "DEMO_MAP_ID",
+
+            mapTypeControl: true,
+            streetViewControl: true,
+            fullscreenControl: true
+
+        });
+
+        // Hagyományos Google Maps helyjelölő
+
+        new AdvancedMarkerElement({
+
+            map: map,
+
+            position: {
+                lat: 46.5684,
+                lng: 20.6545
+            },
+
+            title: "Orosháza központja"
+
+        });
+
+    }
+
+    window.initMap = initMap;
+</script>
+
 <script
-async function initMap() {
-    const { Map } = await google.maps.importLibrary("maps");
-    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCPH-tNEPuXGsyNatW2ZTTlR8NEZKsGJjI&callback=initMap&libraries=marker&v=weekly"
+    async
+    defer>
+</script>
 
-    const map = new Map(document.getElementById("map"), {
-        center: {
-            lat: 46.5684,
-            lng: 20.6545
-        },
-        zoom: 10,
-        mapId: "DEMO_MAP_ID"
-    });
-
-    const heart = document.createElement("div");
-    heart.innerHTML = "❤️";
-    heart.style.fontSize = "32px";
-
-    new AdvancedMarkerElement({
-        map,
-        position: {
-            lat: 46.5684,
-            lng: 20.6545        },
-        content: heart
-    });
-}
-
-window.initMap = initMap;
-
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCPH-tNEPuXGsyNatW2ZTTlR8NEZKsGJjI&libraries=maps,marker"
-    defer
-  ></script>
-  </BODY>
-</HTML>
+</body>
+</html>
