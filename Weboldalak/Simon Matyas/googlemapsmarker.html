@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <HEAD>
+    <meta charset="UTF-8">
+    <TITLE>Térképem</TITLE>
+  </HEAD>
+<body>
+<gmp-map
+    center="47.540917, 17.808123"
+    zoom="8"
+	map-id="DEMO_MAP_ID"
+   style="height: 400px; display: block; width: 80%; border: 4px solid darkgreen; border-radius: 16px;"
+   >
+   <gmp-advanced-marker
+        position="47.540917, 17.808123"
+        title="Nyalka"> 
+			<gmp-pin
+			background="blue"
+			border-color="darkgreen"
+			glyph-color="white">
+			</gmp-pin>
+	</gmp-advanced-marker>
+</gmp-map>
+
+ <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDKFOzFkFjPTfU7CYOUxWaKaqoXF-WXz9c&libraries=maps,marker"
+    defer
+  ></script>
+</body>
+</html>
