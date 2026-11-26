@@ -12,6 +12,34 @@
     style="height: 400px"
   >
 <script
+async function initMap() {
+    const { Map } = await google.maps.importLibrary("maps");
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+    const map = new Map(document.getElementById("map"), {
+        center: {
+            lat: 46.5684,
+            lng: 20.6545
+        },
+        zoom: 10,
+        mapId: "DEMO_MAP_ID"
+    });
+
+    const heart = document.createElement("div");
+    heart.innerHTML = "❤️";
+    heart.style.fontSize = "32px";
+
+    new AdvancedMarkerElement({
+        map,
+        position: {
+            lat: 46.5684,
+            lng: 20.6545        },
+        content: heart
+    });
+}
+
+window.initMap = initMap;
+
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCPH-tNEPuXGsyNatW2ZTTlR8NEZKsGJjI&libraries=maps,marker"
     defer
   ></script>
