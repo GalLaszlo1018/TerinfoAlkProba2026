@@ -5,9 +5,9 @@
 <title>Térkép</title>
 
 <style>
-#map{
-  height:400px;
-  width:100%;
+#map {
+  height: 400px;
+  width: 100%;
 }
 </style>
 </head>
@@ -20,9 +20,7 @@
 function initMap() {
 
   const pozicio = {
-    lat: 47.189533, 
-
-
+    lat: 47.189533,
     lng: 16.944142
   };
 
@@ -34,15 +32,28 @@ function initMap() {
     }
   );
 
+  // Piros házikó ikon definiálása (SVG)
+  const hazikoIkon = {
+    path: "M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z",
+    fillColor: "#e53935",
+    fillOpacity: 1,
+    strokeColor: "#7f0000",
+    strokeWeight: 1.5,
+    scale: 1.5,
+    anchor: new google.maps.Point(12, 20)
+  };
+
   const marker = new google.maps.Marker({
     position: pozicio,
-    map: map
+    map: map,
+    icon: hazikoIkon
   });
 
   marker.addListener("click", () => {
     alert("A markerre kattintottál!");
   });
 }
+</script>
 </script>
 
 <script async defer
