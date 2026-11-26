@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <title>Google Térkép</title>
-    <style>
-        #map {
-            height: 400px;
-            width: 100%;
-        }
-    </style>
+<style>
+	#map {
+    margin: 0 auto;
+    height: 600px;
+    width: 90%;
+    border: 3px solid black;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);}
+</style>
 </head>
 <body>
 
@@ -26,7 +29,7 @@ async function initMap() {
             lat: 47.4968478,
             lng: 19.0696438
         },
-        zoom: 15,
+        zoom: 10,
         mapId: "DEMO_MAP_ID"
     });
 
