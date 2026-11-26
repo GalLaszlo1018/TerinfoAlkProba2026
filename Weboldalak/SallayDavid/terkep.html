@@ -1,24 +1,25 @@
+<!DOCTYPE html>
 <html>
 <head>
-<h1>Google térkép</h1>
-  <title>Add a Map using HTML</title>
-  <link rel="stylesheet" href="./style.css" />
-  <script type="module" src="./index.js"></script>
-</head>
-<body>
+   <meta charset="UTF-8">
+   <TITLE>Google Térkép</TITLE>
+ <head>
+</body>
+
+<h1>Itt van a térképem</h1>
   <gmp-map
-    center="47.369918,20.631614"
+    center="46.031192,  17.666243"
     zoom="6"
     map-id="DEMO_MAP_ID"
     style="height: 400px"
   >
-  </gmp-map>
-  <!--
-    The `defer` attribute causes the script to execute after the full HTML
-    document has been parsed. -->
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAmVuH_e5c6wToSwypEHk_7C6dVRwzwWSc&libraries=maps"
+  <gmp-advanced-marker
+position="47.68027826764161, 16.57734505872476"
+title="Győr"></gmp-advanced-marker>
+  <gmp-map>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAmVuH_e5c6wToSwypEHk_7C6dVRwzwWSc&libraries=maps,marker"
     defer
-  ></script>
+   ></script>
 </body>
 </html>
