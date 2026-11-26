@@ -5,9 +5,9 @@
 <title>Térkép</title>
 
 <style>
-#map{
-  height:400px;
-  width:100%;
+#map {
+  height: 400px;
+  width: 100%;
 }
 </style>
 </head>
@@ -18,13 +18,8 @@
 
 <script>
 function initMap() {
-
-  const pozicio = {
-    lat: 47.189533, 
-
-
-    lng: 16.944142
-  };
+  const sopron = { lat: 47.6817, lng: 16.5845 };
+  const pozicio = { lat: 47.189533, lng: 16.944142 };
 
   const map = new google.maps.Map(
     document.getElementById("map"),
@@ -34,20 +29,56 @@ function initMap() {
     }
   );
 
+  // Piros házikó ikon a célponthoz
+  const hazikoIkon = {
+    path: "M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z",
+    fillColor: "#e53935",
+    fillOpacity: 1,
+    strokeColor: "#7f0000",
+    strokeWeight: 1.5,
+    scale: 1.5,
+    anchor: new google.maps.Point(12, 20)
+  };
+
+  // Célpont (piros házikó)
   const marker = new google.maps.Marker({
     position: pozicio,
-    map: map
+    map: map,
+    icon: hazikoIkon,
+    title: "Házikó"
   });
 
   marker.addListener("click", () => {
-    alert("A markerre kattintottál!");
+    alert("A házikóra kattintottál!");
   });
+
+  // Kiindulópont jelölő (Sopron)
+  new google.maps.Marker({
+    position: sopron,
+    map: map,
+    title: "Sopron"
+  });
+
+  // Útvonaltervezés és kirajzolás
+  const directionsService = new google.maps.DirectionsService();
+  const directionsRenderer = new google.maps.DirectionsRenderer({
+    map: map,
+    suppressMarkers: true
+  });
+
+  directionsService.route(
+    {
+      origin: sopron,
+      destination: pozicio,
+      travelMode: google.maps.TravelMode.DRIVING
+    },
+    (eredmeny, statusz) => {
+      if (statusz === "OK") {
+        directionsRenderer.setDirections(eredmeny);
+      } else {
+        alert("Nem sikerült az útvonaltervezés: " + statusz);
+      }
+    }
+  );
 }
 </script>
-
-<script async defer
-src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBsbfYUGfwQl1uLmHiBjHm6wqCtw77O6rg&callback=initMap">
-</script>
-
-</body>
-</html>
