@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <HEAD>
+    <meta charset="UTF-8">
+    <TITLE>Kalicz Péter függvénye</TITLE>
+  </HEAD>
+<body>
+
+<h1>JavaScript függvény</h1>
+
+<!-- Bekérő mező a gombbal -->
+<p>Add meg a négyzet oldalhosszát (a):</p>
+<input type="number" id="oldal" placeholder="Pl. 5"> <span>m</span>
+<button onclick="szamolas()">Számolás</button>
+
+<!-- Ide írja ki az eredményt -->
+<p id="demo"></p>
+
+<!-- A szkript a függvénnyel -->
+<script>
+function szamolas() {
+    let a = document.getElementById("oldal").value;
+    let terulet = a * a;
+    document.getElementById("demo").innerHTML = "A terület:" + terulet + " m<sup>2</sup>";
+}
+
+</script>
+
+</body>
+</html>
